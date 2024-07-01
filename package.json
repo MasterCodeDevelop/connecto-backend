@@ -11,11 +11,15 @@
     "type": "git",
     "url": "git+https://github.com/MasterCodeDevelop/connecto-backend.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["connecto", "social", "platform"],
+  "author": "MasterCodeDevelop",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MasterCodeDevelop/connecto-backend/issues"
   },
-  "homepage": "https://github.com/MasterCodeDevelop/connecto-backend#readme"
+  "homepage": "https://github.com/MasterCodeDevelop/connecto-backend#readme",
+  "devDependencies": {
+    "ts-node": "10.9.2",
+    "typescript": "5.4.2"
+  }
 }
