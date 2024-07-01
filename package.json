@@ -5,21 +5,27 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MasterCodeDevelop/connecto-backend.git"
   },
-  "keywords": ["connecto", "social", "platform"],
+  "keywords": [
+    "connecto",
+    "social",
+    "platform"
+  ],
   "author": "MasterCodeDevelop",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MasterCodeDevelop/connecto-backend/issues"
   },
   "homepage": "https://github.com/MasterCodeDevelop/connecto-backend#readme",
+  
   "devDependencies": {
-    "ts-node": "10.9.2",
+    "nodemon": "3.1.4",
+    "tsx": "4.7.0",
     "typescript": "5.4.2"
   }
 }
