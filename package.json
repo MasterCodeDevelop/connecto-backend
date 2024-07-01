@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "Backend API for Connecto - a modern social platform",
   "type": "module",
-  "main": "index.js",
+  "main": "src/server.ts",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -22,8 +24,13 @@
     "url": "https://github.com/MasterCodeDevelop/connecto-backend/issues"
   },
   "homepage": "https://github.com/MasterCodeDevelop/connecto-backend#readme",
-  
   "devDependencies": {
+    "@eslint/js": "8.56.0",
+    "@typescript-eslint/eslint-plugin": "8.27.0",
+    "@typescript-eslint/parser": "8.27.0",
+    "eslint": "8.56.0",
+    "eslint-config-prettier": "9.1.0",
+    "globals": "13.24.0",
     "nodemon": "3.1.4",
     "tsx": "4.7.0",
     "typescript": "5.4.2"
