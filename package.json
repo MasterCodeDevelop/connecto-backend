@@ -1,0 +1,21 @@
+{
+  "name": "connecto-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Connecto - a modern social platform",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MasterCodeDevelop/connecto-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MasterCodeDevelop/connecto-backend/issues"
+  },
+  "homepage": "https://github.com/MasterCodeDevelop/connecto-backend#readme"
+}
