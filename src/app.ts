@@ -4,7 +4,7 @@ import connectToDatabase from './config/db';
 import helmet from 'helmet';
 import cors from 'cors';
 import { corsOptions } from './config/corsConfig';
-
+import router from './routes';
 // Load environment variables from .env file
 dotenv.config();
 
@@ -36,11 +36,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /**
- * Health check route
- * - Can be used by load balancers, monitoring tools, or CI/CD pipelines
+ * Routes
  */
-app.get('/', (req, res) => {
-  res.send('✅ API is running...');
-});
+app.use('/api', router); // toutes les routes seront sous /api/...
 
 export default app;
