@@ -25,8 +25,8 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
 
-      // 💡 Règles utiles pour Node.js backend
-      'no-console': 'warn',
+      // Node.js backend rules
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-process-exit': 'error',
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
@@ -35,9 +35,9 @@ export default [
     },
   },
 
-  // ✅ Recommandations de base JS
+  // Base JS recommendations
   js.configs.recommended,
 
-  // ✅ Supprime les conflits avec Prettier
+  // Disable Prettier conflicting rules
   prettier,
 ];

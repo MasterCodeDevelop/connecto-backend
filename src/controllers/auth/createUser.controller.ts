@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import argon2 from 'argon2';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import User from '../../models/User';
+import { hash } from '../../utils/argon';
 
 /**
  * Handles user registration.
@@ -25,7 +25,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
     }
 
     // Secure password hashing with Argon2
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await hash(password);
 
     // Create and persist new user
     const newUser = await User.create({
