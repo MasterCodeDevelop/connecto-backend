@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import User from '../../models/User';
 import { hash } from '../../utils/argon';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
+import errorResponse from '../../utils/errorResponse';
+import { HttpStatus } from '../../utils/httpStatus';
 
 /**
  * Controller responsible for handling user registration.
@@ -54,26 +56,30 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       // Handle JWT-specific failures
       if (err instanceof TokenGenerationError) {
         console.error('[createUser] Token generation error:', err.message);
-        return res.status(500).json({
-          error: true,
-          message: 'Token generation failed. Please try again later.',
-        });
+        return errorResponse(
+          res,
+          'Token generation failed. Please try again later.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
 
       // Fallback for unexpected errors during token creation
       console.error('[createUser] Unexpected error during token creation:', err);
-      return res.status(500).json({
-        error: true,
-        message: 'An unexpected error occurred during token generation.',
-      });
+      return errorResponse(
+        res,
+        'An unexpected error occurred during token generation.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   } catch (err: unknown) {
     // Global error handler for registration flow
     console.error('[createUser] Registration error:', err);
-    return res.status(500).json({
-      error: true,
-      message: 'Registration failed. Please try again later.',
-    });
+    return errorResponse(
+      res,
+      'Registration failed. Please try again later.',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+      err,
+    );
   }
 };
 
