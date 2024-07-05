@@ -1,21 +1,26 @@
 import { Request, Response } from 'express';
-import jwt, { SignOptions } from 'jsonwebtoken';
 import User from '../../models/User';
 import { hash } from '../../utils/argon';
+import generateToken, { TokenGenerationError } from '../../utils/jwt';
 
 /**
- * Handles user registration.
- * Steps:
- * - Checks for duplicate email
- * - Hashes the password securely
- * - Creates and saves the user
- * - Returns a signed JWT
+ * Controller responsible for handling user registration.
+ * Workflow:
+ * Check if email already exists
+ * Hash the password securely
+ * Create and save the new user
+ * Generate a signed JWT token
+ * Return token in success response
+ *
+ * @param req - Express request object
+ * @param res - Express response object
+ * @returns Express response with status and data
  */
 const createUser = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { familyName, name, email, password } = req.body;
 
-    // Check for existing user (ensure index on "email" field in MongoDB)
+    // Check for duplicate user
     const existingUser = await User.findOne({ email }).lean();
     if (existingUser) {
       return res.status(409).json({
@@ -24,10 +29,10 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       });
     }
 
-    // Secure password hashing with Argon2
+    // Hash the password using Argon2
     const hashedPassword = await hash(password);
 
-    // Create and persist new user
+    // Create and save the new user in the database
     const newUser = await User.create({
       name,
       familyName,
@@ -35,29 +40,35 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       password: hashedPassword,
     });
 
-    // Securely generate JWT token
-    const jwtSecret = process.env.JWT_SECRET;
-    const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '24h';
+    // Generate a JWT token for the newly registered user
+    try {
+      const tokenPayload = { userID: newUser._id };
+      const token = await generateToken(tokenPayload);
 
-    if (!jwtSecret) {
-      console.error('❌ JWT_SECRET is not defined in environment variables.');
+      // Return success response
+      return res.status(201).json({
+        message: 'User created successfully.',
+        token,
+      });
+    } catch (err: unknown) {
+      // Handle JWT-specific failures
+      if (err instanceof TokenGenerationError) {
+        console.error('[createUser] Token generation error:', err.message);
+        return res.status(500).json({
+          error: true,
+          message: 'Token generation failed. Please try again later.',
+        });
+      }
+
+      // Fallback for unexpected errors during token creation
+      console.error('[createUser] Unexpected error during token creation:', err);
       return res.status(500).json({
         error: true,
-        message: 'Server misconfiguration. Missing JWT secret.',
+        message: 'An unexpected error occurred during token generation.',
       });
     }
-
-    const tokenPayload = { userID: newUser._id };
-    const signOptions: SignOptions = { expiresIn: jwtExpiresIn };
-
-    const token = jwt.sign(tokenPayload, jwtSecret, signOptions);
-
-    // Success response
-    return res.status(201).json({
-      message: 'User created successfully.',
-      token,
-    });
   } catch (err: unknown) {
+    // Global error handler for registration flow
     console.error('[createUser] Registration error:', err);
     return res.status(500).json({
       error: true,
