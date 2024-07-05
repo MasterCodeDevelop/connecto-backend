@@ -3,16 +3,17 @@ import User from '../../models/User';
 import { hash } from '../../utils/argon';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
 import errorResponse from '../../utils/errorResponse';
-import { HttpStatus } from '../../utils/httpStatus';
-
+import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
+import { userValidationSchema } from '../../validations/user.validation';
 /**
  * Controller responsible for handling user registration.
  * Workflow:
- * Check if email already exists
- * Hash the password securely
- * Create and save the new user
- * Generate a signed JWT token
- * Return token in success response
+ * - Validates incoming request body using Zod
+ * - Check if email already exists
+ * - Hash the password securely
+ * - Create and save the new user
+ * - Generate a signed JWT token
+ * - Return token in success response
  *
  * @param req - Express request object
  * @param res - Express response object
@@ -20,12 +21,18 @@ import { HttpStatus } from '../../utils/httpStatus';
  */
 const createUser = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const { familyName, name, email, password } = req.body;
+    // Validate input
+    const validation = userValidationSchema.safeParse(req.body);
+    if (!validation.success) {
+      const errorMessages = validation.error.issues.map((i) => i.message).join(', ');
+      return errorResponse(res, errorMessages, BAD_REQUEST);
+    }
 
+    const { familyName, name, email, password } = validation.data;
     // Check for duplicate user
     const existingUser = await User.findOne({ email }).lean();
     if (existingUser) {
-      return res.status(409).json({
+      return res.status(CONFLICT).json({
         error: true,
         message: 'This email is already in use.',
       });
@@ -48,7 +55,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       const token = await generateToken(tokenPayload);
 
       // Return success response
-      return res.status(201).json({
+      return res.status(CREATED).json({
         message: 'User created successfully.',
         token,
       });
@@ -59,7 +66,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
         return errorResponse(
           res,
           'Token generation failed. Please try again later.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
+          INTERNAL_SERVER_ERROR,
         );
       }
 
@@ -68,7 +75,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       return errorResponse(
         res,
         'An unexpected error occurred during token generation.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        INTERNAL_SERVER_ERROR,
       );
     }
   } catch (err: unknown) {
@@ -77,7 +84,7 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
     return errorResponse(
       res,
       'Registration failed. Please try again later.',
-      HttpStatus.INTERNAL_SERVER_ERROR,
+      INTERNAL_SERVER_ERROR,
       err,
     );
   }
