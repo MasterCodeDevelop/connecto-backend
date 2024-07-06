@@ -4,7 +4,7 @@ import { hash } from '../../utils/argon';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
 import errorResponse from '../../utils/errorResponse';
 import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
-import { userValidationSchema } from '../../validations/user.validation';
+import { registerSchema } from '../../validations/user.validation';
 /**
  * Controller responsible for handling user registration.
  * Workflow:
@@ -22,7 +22,7 @@ import { userValidationSchema } from '../../validations/user.validation';
 const createUser = async (req: Request, res: Response): Promise<Response> => {
   try {
     // Validate input
-    const validation = userValidationSchema.safeParse(req.body);
+    const validation = registerSchema.safeParse(req.body);
     if (!validation.success) {
       const errorMessages = validation.error.issues.map((i) => i.message).join(', ');
       return errorResponse(res, errorMessages, BAD_REQUEST);

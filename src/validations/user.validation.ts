@@ -1,42 +1,67 @@
 import { z } from 'zod';
 
 /**
- * Validation schema for user registration using Zod.
- * Ensures clean and secure user input for account creation.
+ * Common field schemas reused across authentication schemas.
  */
-export const userValidationSchema = z
+const emailField = z
+  .string()
+  .trim()
+  .email('Invalid email format.')
+  .max(100, 'Email address is too long.');
+
+const passwordField = z
+  .string()
+  .min(8, 'Password must be at least 8 characters long.')
+  .max(50, 'Password must not exceed 50 characters.')
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+    'Password must include uppercase, lowercase, number, and special character.',
+  );
+
+const nameField = z
+  .string()
+  .trim()
+  .min(2, 'First name must be at least 2 characters long.')
+  .max(50, 'First name must not exceed 50 characters.')
+  .regex(
+    /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/,
+    'First name can only contain alphabetic characters and spaces.',
+  );
+
+const familyNameField = z
+  .string()
+  .trim()
+  .min(2, 'Family name must be at least 2 characters long.')
+  .max(50, 'Family name must not exceed 50 characters.')
+  .regex(
+    /^[a-zA-ZÀ-ÿ]+(?: [a-zA-ZÀ-ÿ]+)*$/,
+    'Family name can only contain alphabetic characters and spaces.',
+  );
+
+/**
+ * Schema for user registration (sign-up).
+ * Validates full user profile input.
+ */
+export const registerSchema = z
   .object({
-    familyName: z
-      .string()
-      .trim()
-      .min(2, 'Family name must be at least 2 characters long.')
-      .max(50, 'Family name must not exceed 50 characters.')
-      .regex(
-        /^[a-zA-Z]+(?: [a-zA-Z]+)*$/,
-        'Family name can only contain alphabetic characters and spaces.',
-      ),
-
-    name: z
-      .string()
-      .trim()
-      .min(2, 'First name must be at least 2 characters long.')
-      .max(50, 'First name must not exceed 50 characters.')
-      .regex(
-        /^[a-zA-Z]+(?: [a-zA-Z]+)*$/,
-        'First name can only contain alphabetic characters and spaces.',
-      ),
-
-    email: z.string().trim().email('Invalid email format.').max(100, 'Email address is too long.'),
-
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long.')
-      .max(50, 'Password must not exceed 50 characters.')
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-        'Password must include uppercase, lowercase, number, and special character.',
-      ),
+    name: nameField,
+    familyName: familyNameField,
+    email: emailField,
+    password: passwordField,
   })
   .strict();
 
-export type UserRegistrationDTO = z.infer<typeof userValidationSchema>;
+export type RegisterDTO = z.infer<typeof registerSchema>;
+
+/**
+ * Schema for user login (sign-in).
+ * Requires only email and password.
+ */
+export const loginSchema = z
+  .object({
+    email: emailField,
+    password: passwordField,
+  })
+  .strict();
+
+export type LoginDTO = z.infer<typeof loginSchema>;
