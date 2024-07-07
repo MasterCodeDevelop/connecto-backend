@@ -6,7 +6,7 @@ import { OK, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } from '../../utils/h
 /**
  * Retrieves the authenticated user's profile information.
  *
- * @route   GET /api/user/
+ * @route   GET /api/user/profile
  * @access  Private (Requires JWT authentication)
  * @param req - Express request object containing `auth.userID` from JWT
  * @param res - Express response object
@@ -27,6 +27,7 @@ const getUserProfile = async (req: Request, res: Response): Promise<Response> =>
     }
 
     return res.status(OK).json({
+      success: true,
       message: 'User profile retrieved successfully.',
       data: {
         user,

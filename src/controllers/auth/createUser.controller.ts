@@ -15,6 +15,7 @@ import { registerSchema } from '../../validations/user.validation';
  * - Generate a signed JWT token
  * - Return token in success response
  *
+ * @route   POST /api/auth/signup
  * @param req - Express request object
  * @param res - Express response object
  * @returns Express response with status and data
@@ -56,8 +57,11 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
 
       // Return success response
       return res.status(CREATED).json({
+        success: true,
         message: 'User created successfully.',
-        token,
+        data: {
+          token,
+        },
       });
     } catch (err: unknown) {
       // Handle JWT-specific failures

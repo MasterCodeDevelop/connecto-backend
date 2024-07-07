@@ -20,6 +20,7 @@ import { loginSchema } from '../../validations/user.validation';
  * - Compare hashed password using Argon2
  * - Generate JWT token on successful login
  *
+ * @route   POST /api/auth/login
  * @param req - Express Request containing email and password
  * @param res - Express Response used to send result
  * @returns Express Response with token or error
@@ -52,8 +53,11 @@ const loginUser = async (req: Request, res: Response): Promise<Response> => {
       const token = await generateToken(tokenPayload);
 
       return res.status(OK).json({
+        success: true,
         message: 'Login successful.',
-        token,
+        data: {
+          token,
+        },
       });
     } catch (err) {
       if (err instanceof TokenGenerationError) {
