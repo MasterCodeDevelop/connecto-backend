@@ -2,14 +2,8 @@ import { Request, Response } from 'express';
 import argon2 from 'argon2';
 import User from '../../models/User';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
-import errorResponse from '../../utils/errorResponse';
-import {
-  BAD_REQUEST,
-  NOT_FOUND,
-  UNAUTHORIZED,
-  OK,
-  INTERNAL_SERVER_ERROR,
-} from '../../utils/httpStatus';
+import { errorResponse, successResponse } from '../../utils/responses';
+import { BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
 import { loginSchema } from '../../validations/user.validation';
 
 /**
@@ -52,28 +46,18 @@ const loginUser = async (req: Request, res: Response): Promise<Response> => {
       const tokenPayload = { userID: user._id, isAdmin: user.isAdmin };
       const token = await generateToken(tokenPayload);
 
-      return res.status(OK).json({
-        success: true,
-        message: 'Login successful.',
-        data: {
-          token,
-        },
-      });
+      return successResponse(res, 'Login successful.', { token });
     } catch (err) {
       if (err instanceof TokenGenerationError) {
-        return errorResponse(res, 'Failed to generate token.', INTERNAL_SERVER_ERROR);
+        return errorResponse(res, 'Failed to generate token.');
       }
 
       console.error('[loginUser] Unexpected token generation error:', err);
-      return errorResponse(
-        res,
-        'An unexpected error occurred during login.',
-        INTERNAL_SERVER_ERROR,
-      );
+      return errorResponse(res, 'An unexpected error occurred during login.');
     }
   } catch (err) {
     console.error('[loginUser] Login error:', err);
-    return errorResponse(res, 'An error occurred during login.', INTERNAL_SERVER_ERROR);
+    return errorResponse(res, 'An error occurred during login.');
   }
 };
 

@@ -1,5 +1,28 @@
 import { Response } from 'express';
 import type { HttpStatusCode } from './httpStatus';
+import { INTERNAL_SERVER_ERROR, OK } from './httpStatus';
+
+/**
+ * Sends a standardized successful response.
+ *
+ * @param res - Express response object
+ * @param message - Human-readable success message
+ * @param data - Optional payload to return
+ * @param status - Optional HTTP status code (default: 200 OK)
+ * @returns Express Response with formatted JSON
+ */
+export const successResponse = (
+  res: Response,
+  message: string,
+  data?: unknown,
+  status: HttpStatusCode = OK,
+): Response => {
+  return res.status(status).json({
+    success: true,
+    message,
+    data,
+  });
+};
 
 /**
  * Sends a standardized error response.
@@ -10,10 +33,10 @@ import type { HttpStatusCode } from './httpStatus';
  * @param details - Optional metadata to help debug the error
  * @returns Express Response with structured JSON error payload
  */
-const errorResponse = (
+export const errorResponse = (
   res: Response,
   message: string,
-  status: HttpStatusCode = 500,
+  status: HttpStatusCode = INTERNAL_SERVER_ERROR,
   details?: unknown,
 ): Response => {
   const responseBody: Record<string, unknown> = {
@@ -28,5 +51,3 @@ const errorResponse = (
 
   return res.status(status).json(responseBody);
 };
-
-export default errorResponse;

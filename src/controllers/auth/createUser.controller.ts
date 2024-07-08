@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import User from '../../models/User';
 import { hash } from '../../utils/argon';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
-import errorResponse from '../../utils/errorResponse';
+import { errorResponse, successResponse } from '../../utils/responses';
 import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
 import { registerSchema } from '../../validations/user.validation';
 /**
@@ -56,31 +56,17 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
       const token = await generateToken(tokenPayload);
 
       // Return success response
-      return res.status(CREATED).json({
-        success: true,
-        message: 'User created successfully.',
-        data: {
-          token,
-        },
-      });
+      return successResponse(res, 'User created successfully.', { token }, CREATED);
     } catch (err: unknown) {
       // Handle JWT-specific failures
       if (err instanceof TokenGenerationError) {
         console.error('[createUser] Token generation error:', err.message);
-        return errorResponse(
-          res,
-          'Token generation failed. Please try again later.',
-          INTERNAL_SERVER_ERROR,
-        );
+        return errorResponse(res, 'Token generation failed. Please try again later.');
       }
 
       // Fallback for unexpected errors during token creation
       console.error('[createUser] Unexpected error during token creation:', err);
-      return errorResponse(
-        res,
-        'An unexpected error occurred during token generation.',
-        INTERNAL_SERVER_ERROR,
-      );
+      return errorResponse(res, 'An unexpected error occurred during token generation.');
     }
   } catch (err: unknown) {
     // Global error handler for registration flow

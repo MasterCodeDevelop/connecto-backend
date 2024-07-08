@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../../models/User';
-import errorResponse from '../../utils/errorResponse';
-import { OK, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } from '../../utils/httpStatus';
+import { errorResponse, successResponse } from '../../utils/responses';
+import { BAD_REQUEST, NOT_FOUND } from '../../utils/httpStatus';
 
 /**
  * Retrieves the authenticated user's profile information.
@@ -26,20 +26,10 @@ const getUserProfile = async (req: Request, res: Response): Promise<Response> =>
       return errorResponse(res, 'User not found.', NOT_FOUND);
     }
 
-    return res.status(OK).json({
-      success: true,
-      message: 'User profile retrieved successfully.',
-      data: {
-        user,
-      },
-    });
+    return successResponse(res, 'User profile retrieved successfully.', user);
   } catch (error) {
     console.error('[getUserProfile] Error retrieving user:', error);
-    return errorResponse(
-      res,
-      'An error occurred while retrieving the user profile.',
-      INTERNAL_SERVER_ERROR,
-    );
+    return errorResponse(res, 'An error occurred while retrieving the user profile.');
   }
 };
 

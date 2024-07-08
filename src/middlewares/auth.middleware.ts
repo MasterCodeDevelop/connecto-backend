@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { UNAUTHORIZED, INTERNAL_SERVER_ERROR, FORBIDDEN } from '../utils/httpStatus';
-import errorResponse from '../utils/errorResponse';
+import { UNAUTHORIZED, FORBIDDEN } from '../utils/httpStatus';
+import { errorResponse } from '../utils/responses';
 
 // Interface defining the expected structure of the JWT payload
 interface AuthPayload extends JwtPayload {
@@ -48,11 +48,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void |
 
   // Ensure the JWT secret is available in environment variables
   if (!jwtSecret) {
-    return errorResponse(
-      res,
-      'JWT secret key is missing in environment variables!',
-      INTERNAL_SERVER_ERROR,
-    );
+    return errorResponse(res, 'JWT secret key is missing in environment variables!');
   }
 
   try {
@@ -79,7 +75,7 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction): void |
     }
 
     // Catch-all for unexpected errors
-    return errorResponse(res, 'Internal server error', INTERNAL_SERVER_ERROR);
+    return errorResponse(res, 'Internal server error');
   }
 };
 
