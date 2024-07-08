@@ -65,3 +65,18 @@ export const loginSchema = z
   .strict();
 
 export type LoginDTO = z.infer<typeof loginSchema>;
+
+/**
+ * Schema for profile update (optional name/familyName)
+ * At least one field is required.
+ */
+export const updateProfileSchema = z
+  .object({
+    name: nameField.optional(),
+    familyName: familyNameField.optional(),
+  })
+  .refine((data) => data.name || data.familyName, {
+    message: 'At least one field (name or familyName) must be provided.',
+  });
+
+export type UpdateProfileDTO = z.infer<typeof updateProfileSchema>;
