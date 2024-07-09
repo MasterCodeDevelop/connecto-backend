@@ -1,8 +1,14 @@
 import { Router, Request, Response } from 'express';
 import getUserProfile from '../controllers/user/getUserProfile.controller';
 import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
+import { createUploadMiddleware } from '../middlewares/upload.middleware';
 
+// Middleware to handle profile picture upload
+const avatarUpload = createUploadMiddleware('image', 'users').single;
+
+// User routes
 const router = Router();
+
 /**
  * @route   GET /api/user/profile
  * @desc    Fetch user profile using a valid token
@@ -13,11 +19,12 @@ router.get('/profile', (req: Request, res: Response) => {
 });
 
 /**
- * @route   PUT /api/user/profile
- * @desc    Update user profile using a valid token
+ * @route   PATCH /api/user/profile
+ * @desc    Update user profile (with profile picture upload)
  * @access  Private
  */
-router.put('/profile', (req: Request, res: Response) => {
+router.patch('/profile', avatarUpload, (req: Request, res: Response) => {
   updateUserProfile(req, res);
 });
+
 export default router;
