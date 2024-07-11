@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import getUserProfile from '../controllers/user/getUserProfile.controller';
 import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
 import { createUploadMiddleware } from '../middlewares/upload.middleware';
+import { updatePassword } from '../controllers/user/updatePassword.controller';
 
 // Middleware to handle profile picture upload
 const avatarUpload = createUploadMiddleware('image', 'users').single;
@@ -25,6 +26,15 @@ router.get('/profile', (req: Request, res: Response) => {
  */
 router.patch('/profile', avatarUpload, (req: Request, res: Response) => {
   updateUserProfile(req, res);
+});
+
+/**
+ * @route   PUT /password
+ * @desc    Updates the user's password.
+ * @access  Private (JWT required)
+ */
+router.put('/password', async (req: Request, res: Response) => {
+  await updatePassword(req, res);
 });
 
 export default router;

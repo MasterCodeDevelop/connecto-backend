@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
 /**
- * Common field schemas reused across authentication schemas.
+ * Common field schemas for authentication and user data validation.
+ * Each schema is designed to enforce specific constraints
+ * for the corresponding field using Zod.
  */
 const emailField = z
   .string()
@@ -18,6 +20,14 @@ const passwordField = z
     'Password must include uppercase, lowercase, number, and special character.',
   );
 
+const newPasswordField = z
+  .string()
+  .min(8, 'New password must be at least 8 characters long.')
+  .max(50, 'New password must not exceed 50 characters.')
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+    'New password must include uppercase, lowercase, number, and special character.',
+  );
 const nameField = z
   .string()
   .trim()
@@ -77,6 +87,26 @@ export const updateProfileSchema = z
   })
   .refine((data) => data.name || data.familyName, {
     message: 'At least one field (name or familyName) must be provided.',
+  });
+
+/**
+ * Schema for updating a password.
+ *
+ * This schema enforces that:
+ * - The current password and the new password meet the defined validation rules.
+ * - The new password must be different from the current password.
+ *
+ * The `strict()` method is used to disallow any extra keys in the object.
+ */
+export const passwordSchema = z
+  .object({
+    password: passwordField,
+    newPassword: newPasswordField,
+  })
+  .strict()
+  .refine((data) => data.password !== data.newPassword, {
+    message: 'The new password must be different from the current password.',
+    path: ['newPassword'],
   });
 
 export type UpdateProfileDTO = z.infer<typeof updateProfileSchema>;
