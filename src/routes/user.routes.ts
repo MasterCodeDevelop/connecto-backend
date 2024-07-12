@@ -3,6 +3,7 @@ import { createUploadMiddleware } from '../middlewares/upload.middleware';
 import { getUserProfile } from '../controllers/user/getUserProfile.controller';
 import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
 import { updatePassword } from '../controllers/user/updatePassword.controller';
+import { deleteUser } from '../controllers/user/deleteUser.controller';
 
 // Middleware to handle profile picture upload
 const avatarUpload = createUploadMiddleware('image', 'users').single;
@@ -37,4 +38,12 @@ router.put('/password', async (req: Request, res: Response) => {
   await updatePassword(req, res);
 });
 
+/**
+ * @route   DELETE /api/user
+ * @desc    Deletes the user account and its associated files.
+ * @access  Private
+ */
+router.delete('/', async (req: Request, res: Response) => {
+  await deleteUser(req, res);
+});
 export default router;
