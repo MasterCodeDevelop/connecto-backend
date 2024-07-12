@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import getUserProfile from '../controllers/user/getUserProfile.controller';
-import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
 import { createUploadMiddleware } from '../middlewares/upload.middleware';
+import { getUserProfile } from '../controllers/user/getUserProfile.controller';
+import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
 import { updatePassword } from '../controllers/user/updatePassword.controller';
 
 // Middleware to handle profile picture upload
@@ -15,8 +15,8 @@ const router = Router();
  * @desc    Fetch user profile using a valid token
  * @access  Private
  */
-router.get('/profile', (req: Request, res: Response) => {
-  getUserProfile(req, res);
+router.get('/profile', async (req: Request, res: Response) => {
+  await getUserProfile(req, res);
 });
 
 /**
@@ -24,8 +24,8 @@ router.get('/profile', (req: Request, res: Response) => {
  * @desc    Update user profile (with profile picture upload)
  * @access  Private
  */
-router.patch('/profile', avatarUpload, (req: Request, res: Response) => {
-  updateUserProfile(req, res);
+router.patch('/profile', avatarUpload, async (req: Request, res: Response) => {
+  await updateUserProfile(req, res);
 });
 
 /**

@@ -12,7 +12,7 @@ import { BAD_REQUEST, NOT_FOUND } from '../../utils/httpStatus';
  * @param res - Express response object
  * @returns User information or error response
  */
-const getUserProfile = async (req: Request, res: Response): Promise<Response> => {
+export const getUserProfile = async (req: Request, res: Response): Promise<Response> => {
   try {
     const userID = req.auth?.userID;
 
@@ -32,5 +32,3 @@ const getUserProfile = async (req: Request, res: Response): Promise<Response> =>
     return errorResponse(res, 'An error occurred while retrieving the user profile.');
   }
 };
-
-export default getUserProfile;

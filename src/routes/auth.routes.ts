@@ -9,8 +9,8 @@ const router = Router();
  * @desc    Create a new user account
  * @access  Public
  */
-router.post('/signup', (req: Request, res: Response) => {
-  createUser(req, res);
+router.post('/signup', async (req: Request, res: Response) => {
+  await createUser(req, res);
 });
 
 /**
@@ -18,8 +18,8 @@ router.post('/signup', (req: Request, res: Response) => {
  * @desc    Authenticate user and return token
  * @access  Public
  */
-router.post('/login', (req: Request, res: Response) => {
-  loginUser(req, res);
+router.post('/login', async (req: Request, res: Response) => {
+  await loginUser(req, res);
 });
 
 export default router;
