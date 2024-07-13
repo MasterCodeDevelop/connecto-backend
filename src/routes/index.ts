@@ -4,6 +4,7 @@ import userRoutes from './user.routes';
 import fileRoutes from './file.routes';
 import authMiddleware from '../middlewares/auth.middleware';
 import urlTokenAuthMiddleware from '../middlewares/urlTokenAuth.middleware';
+import postRoutes from './post.routes';
 
 const router = Router();
 
@@ -39,6 +40,19 @@ router.use(
     authMiddleware(req, res, next);
   },
   userRoutes,
+);
+
+/**
+ * Mounts private routes under /post path
+ * Applies authMiddleware globally to all routes
+ * These routes require authentication.
+ */
+router.use(
+  '/post',
+  (req: Request, res: Response, next: NextFunction) => {
+    authMiddleware(req, res, next);
+  },
+  postRoutes,
 );
 
 export default router;
