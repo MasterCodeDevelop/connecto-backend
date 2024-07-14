@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { createPost } from '../controllers/posts/createPost.controller';
 import { createUploadMiddleware } from '../middlewares/upload.middleware';
 import { fetchAllPosts } from '../controllers/posts/fetchAllPosts.controller';
+import { fetchPostById } from '../controllers/posts/fetchPostById.controller';
 
 // Create middleware for handling file uploads.
 const filePost = createUploadMiddleware('image', 'posts').single;
@@ -29,6 +30,17 @@ router.post('/', filePost, async (req: Request, res: Response) => {
  */
 router.get('/', async (req: Request, res: Response) => {
   await fetchAllPosts(req, res);
+});
+
+/**
+ * This route fetches a specific post by its ID.
+ *
+ * @route   GET /api/post/:id
+ * @desc    Fetch a specific post by its ID.
+ * @access  Private
+ */
+router.get('/:id', async (req: Request, res: Response) => {
+  await fetchPostById(req, res);
 });
 
 export default router;
