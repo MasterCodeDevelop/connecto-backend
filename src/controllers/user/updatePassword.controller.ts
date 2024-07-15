@@ -34,9 +34,7 @@ export const updatePassword = async (req: Request, res: Response): Promise<Respo
   try {
     // Check if the user ID is provided in the request
     const userID = req.auth?.userID;
-    if (!userID) {
-      return errorResponse(res, 'User ID is missing from the request.', BAD_REQUEST);
-    }
+    if (!userID) return errorResponse(res, 'User ID is missing from the request.', BAD_REQUEST);
 
     // Validate input using Zod schema
     const validation = passwordSchema.safeParse(req.body);
@@ -48,15 +46,11 @@ export const updatePassword = async (req: Request, res: Response): Promise<Respo
 
     // Retrieve the user's current password from the database
     const user = await User.findById(userID).select('password');
-    if (!user) {
-      return errorResponse(res, 'User not found.', NOT_FOUND);
-    }
+    if (!user) return errorResponse(res, 'User not found.', NOT_FOUND);
 
     // Verify that the provided current password matches the stored hash
     const isPasswordValid = await argon2.verify(user.password, password);
-    if (!isPasswordValid) {
-      return errorResponse(res, 'Incorrect password.', UNAUTHORIZED);
-    }
+    if (!isPasswordValid) return errorResponse(res, 'Incorrect password.', UNAUTHORIZED);
 
     // Hash the new password before updating it in the database
     const hashedNewPassword = await hash(newPassword);
@@ -66,6 +60,8 @@ export const updatePassword = async (req: Request, res: Response): Promise<Respo
 
     // Return success response
     return successResponse(res, 'Password updated successfully.');
+
+    // Handle errors
   } catch (error) {
     // Log the error for debugging purposes
     console.error('Error updating password:', error);

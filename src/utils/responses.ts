@@ -14,7 +14,7 @@ import { INTERNAL_SERVER_ERROR, OK } from './httpStatus';
 export const successResponse = (
   res: Response,
   message: string,
-  data?: unknown,
+  data?: object,
   status: HttpStatusCode = OK,
 ): Response => {
   return res.status(status).json({

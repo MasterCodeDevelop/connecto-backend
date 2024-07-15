@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Post from '../../models/Post';
 import { errorResponse, successResponse } from '../../utils/responses';
+import { BAD_REQUEST, NOT_FOUND } from '../../utils/httpStatus';
 /**
  * Controller to fetch a post by its ID.
  *
@@ -16,23 +17,18 @@ export const fetchPostById = async (req: Request, res: Response): Promise<Respon
   try {
     // Extract the post ID from the URL parameters.
     const postId = req.params.id;
-    if (!postId) {
-      return res.status(400).json({ message: 'Post ID is required.' });
-    }
+    if (!postId) return errorResponse(res, 'Post ID is required.', BAD_REQUEST);
 
     // Query the database for the post by ID and populate the "author" field.
     const post = await Post.findById(postId).populate('author', 'name familyName profilePicture');
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found.' });
-    }
+    if (!post) return errorResponse(res, 'Post not found.', NOT_FOUND);
 
     // Return the post data with a successful status code.
-    return successResponse(res, 'Post retrieved successfully.', post);
+    return successResponse(res, 'Post retrieved successfully.', { post });
 
     // Log and return any errors that occur during the process
   } catch (error) {
     console.error('Error retrieving post:', error);
-
     return errorResponse(res, 'An error occurred while retrieving the post.');
   }
 };

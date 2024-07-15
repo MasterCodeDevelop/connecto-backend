@@ -26,19 +26,14 @@ const POST_UPLOADS_DIR = path.join(
  */
 export const getPostFile = (req: Request, res: Response): Response | void => {
   const { filename } = req.params;
+  const filePath = path.join(POST_UPLOADS_DIR, filename);
 
   // Security check: prevent directory traversal and restrict extensions
   const isValidFilename = /^[\w-]+\.(jpg|jpeg|png|webp)$/i.test(filename);
-  if (!isValidFilename) {
-    return errorResponse(res, 'Invalid post filename format.', BAD_REQUEST);
-  }
-
-  const filePath = path.join(POST_UPLOADS_DIR, filename);
+  if (!isValidFilename) return errorResponse(res, 'Invalid post filename format.', BAD_REQUEST);
 
   // File not found
-  if (!fs.existsSync(filePath)) {
-    return errorResponse(res, 'Post file not found.', NOT_FOUND);
-  }
+  if (!fs.existsSync(filePath)) return errorResponse(res, 'Post file not found.', NOT_FOUND);
 
   // erve the file securely
   return res.sendFile(filePath);

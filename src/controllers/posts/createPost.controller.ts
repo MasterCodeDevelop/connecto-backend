@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { postSchema } from '../../validations/post.validation';
 import Post from '../../models/Post';
-import { successResponse } from '../../utils/responses';
-
+import { errorResponse, successResponse } from '../../utils/responses';
+import { BAD_REQUEST, UNAUTHORIZED } from '../../utils/httpStatus';
 /**
  * Controller to create a new post with an image upload.
  *
@@ -20,15 +20,13 @@ export const createPost = async (req: Request, res: Response): Promise<Response>
     const validation = postSchema.safeParse(req.body);
     if (!validation.success) {
       const errors = validation.error.issues.map((issue) => issue.message);
-      return res.status(400).json({ errors });
+      return errorResponse(res, 'Invalid post data', BAD_REQUEST, errors);
     }
     const { content } = validation.data;
 
     // Ensure the user is authenticated.
     const author = req.auth?.userID;
-    if (!author) {
-      return res.status(401).json({ message: 'User not authenticated.' });
-    }
+    if (!author) return errorResponse(res, 'User not authenticated.', UNAUTHORIZED);
 
     // Get the filename of the uploaded file
     const file = req.file?.filename;
@@ -50,7 +48,7 @@ export const createPost = async (req: Request, res: Response): Promise<Response>
     );
 
     // Return a success response with the created post.
-    return successResponse(res, 'Post created successfully.', post);
+    return successResponse(res, 'Post created successfully.', { post });
 
     // Log and return any errors that occur during post creation
   } catch (error) {

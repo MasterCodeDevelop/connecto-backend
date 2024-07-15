@@ -23,7 +23,7 @@ export const fetchAllPosts = async (req: Request, res: Response): Promise<Respon
       .lean();
 
     // Return a successful response with the list of posts.
-    return successResponse(res, 'Posts retrieved successfully.', posts);
+    return successResponse(res, 'Posts retrieved successfully.', { posts });
 
     // Log and return any errors that occur during the process
   } catch (error) {

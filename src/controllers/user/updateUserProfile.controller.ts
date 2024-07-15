@@ -31,34 +31,27 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<Re
     const newProfilePicture = req.file ? req.file.filename : undefined;
 
     //Ensure authenticated user
-    if (!userID) {
-      return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
-    }
+    if (!userID) return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
 
     // Validate input fields with Zod
     const validation = updateProfileSchema.safeParse(req.body);
-    if (!validation.success && !newProfilePicture) {
+    if (!validation.success && !newProfilePicture)
       return errorResponse(res, 'Validation failed.', BAD_REQUEST, validation.error.flatten());
-    }
     const { name, familyName } = validation.success ? validation.data : {};
 
     // Fetch current user
     const user = await User.findById(userID);
-    if (!user) {
-      return errorResponse(res, 'User not found.', NOT_FOUND);
-    }
+    if (!user) return errorResponse(res, 'User not found.', NOT_FOUND);
 
     // Check for redundant data (no actual changes)
     const isSameName = name ? name === user.name : true;
     const isSameFamilyName = familyName ? familyName === user.familyName : true;
-
-    if (isSameName && isSameFamilyName && !newProfilePicture) {
+    if (isSameName && isSameFamilyName && !newProfilePicture)
       return errorResponse(
         res,
         'Provided values are identical to existing profile data.',
         BAD_REQUEST,
       );
-    }
 
     // Prepare updated fields
     const updatedFields: Partial<{
@@ -92,6 +85,8 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<Re
 
     // Response with the updated user data
     return successResponse(res, 'User profile updated successfully.', { user: updatedUser });
+
+    // Handle errors
   } catch (error) {
     console.error('Profile update error:', error);
     return errorResponse(res, 'An unexpected error occurred while updating the profile.');

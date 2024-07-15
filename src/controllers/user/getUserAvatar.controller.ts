@@ -27,19 +27,14 @@ const AVATAR_UPLOADS_DIR = path.join(
  */
 export const getUserAvatar = (req: Request, res: Response): Response | void => {
   const { filename } = req.params;
+  const filePath = path.join(AVATAR_UPLOADS_DIR, filename);
 
   // Security check: prevent directory traversal and restrict extensions
   const isValidFilename = /^[\w-]+\.(jpg|jpeg|png|webp)$/i.test(filename);
-  if (!isValidFilename) {
-    return errorResponse(res, 'Invalid filename format.', BAD_REQUEST);
-  }
-
-  const filePath = path.join(AVATAR_UPLOADS_DIR, filename);
+  if (!isValidFilename) return errorResponse(res, 'Invalid filename format.', BAD_REQUEST);
 
   // File not found
-  if (!fs.existsSync(filePath)) {
-    return errorResponse(res, 'Avatar not found.', NOT_FOUND);
-  }
+  if (!fs.existsSync(filePath)) return errorResponse(res, 'Avatar not found.', NOT_FOUND);
 
   // erve the image securely
   return res.sendFile(filePath);

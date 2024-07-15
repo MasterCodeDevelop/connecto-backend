@@ -27,30 +27,23 @@ const AVATAR_UPLOADS_DIR = path.join(
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
   try {
     // Verify if the user is authenticated.
-    if (!req.auth || !req.auth.userID) {
-      return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
-    }
-    const userID = req.auth.userID;
+    if (!req.auth || !req.auth.userID) return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
+    const { userID } = req.auth;
 
     // Extract and validate the provided password.
     const { password } = req.body;
     const passwordSchema = loginSchema.shape.password;
     const validationPassword = passwordSchema.safeParse(password);
-    if (!validationPassword.success) {
+    if (!validationPassword.success)
       return errorResponse(res, 'Password is required.', BAD_REQUEST);
-    }
 
     // Retrieve the user along with the password and profile picture fields.
     const user = await User.findById(userID).select('password profilePicture');
-    if (!user) {
-      return errorResponse(res, 'This user does not exist.', NOT_FOUND);
-    }
+    if (!user) return errorResponse(res, 'This user does not exist.', NOT_FOUND);
 
     // Verify that the provided password matches the stored hash.
     const valid = await verify(user.password, password);
-    if (!valid) {
-      return errorResponse(res, 'Incorrect password.', UNAUTHORIZED);
-    }
+    if (!valid) return errorResponse(res, 'Incorrect password.', UNAUTHORIZED);
 
     // Delete the profile picture if it is not the default avatar.
     if (user.profilePicture !== 'avatar.png') {
