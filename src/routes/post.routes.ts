@@ -3,6 +3,7 @@ import { createPost } from '../controllers/posts/createPost.controller';
 import { createUploadMiddleware } from '../middlewares/upload.middleware';
 import { fetchAllPosts } from '../controllers/posts/fetchAllPosts.controller';
 import { fetchPostById } from '../controllers/posts/fetchPostById.controller';
+import { likePost } from '../controllers/posts/likePost.controller';
 
 // Create middleware for handling file uploads.
 const filePost = createUploadMiddleware('image', 'posts').single;
@@ -41,6 +42,17 @@ router.get('/', async (req: Request, res: Response) => {
  */
 router.get('/:id', async (req: Request, res: Response) => {
   await fetchPostById(req, res);
+});
+
+/**
+ * This route allows a user to like or unlike a post.
+ *
+ * @route   PATCH /api/post/:id/like
+ * @desc    Like or unlike a post.
+ * @access  Private
+ */
+router.patch('/:id/like', async (req: Request, res: Response) => {
+  likePost(req, res);
 });
 
 export default router;
