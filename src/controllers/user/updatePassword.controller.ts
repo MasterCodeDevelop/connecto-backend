@@ -4,14 +4,12 @@ import User from '../../models/User';
 import { hash } from '../../utils/argon';
 import { BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
 import { errorResponse, successResponse } from '../../utils/responses';
-import { passwordSchema } from '../../validations/user.validation';
 
 /**
  * Updates the user's password.
  *
  * This async function:
  * - Checks for req.auth.userID.
- * - Validates passwords using Zod.
  * - Compares the current password with the stored hash.
  * - Hashes the new password with Argon2.
  * - Updates the password in the database.
@@ -32,17 +30,11 @@ import { passwordSchema } from '../../validations/user.validation';
  */
 export const updatePassword = async (req: Request, res: Response): Promise<Response> => {
   try {
+    const { password, newPassword } = req.body;
+
     // Check if the user ID is provided in the request
     const userID = req.auth?.userID;
     if (!userID) return errorResponse(res, 'User ID is missing from the request.', BAD_REQUEST);
-
-    // Validate input using Zod schema
-    const validation = passwordSchema.safeParse(req.body);
-    if (!validation.success) {
-      const errorMessages = validation.error.issues.map((i) => i.message).join(', ');
-      return errorResponse(res, errorMessages, BAD_REQUEST);
-    }
-    const { password, newPassword } = validation.data;
 
     // Retrieve the user's current password from the database
     const user = await User.findById(userID).select('password');

@@ -1,13 +1,11 @@
 import { Request, Response } from 'express';
-import { postSchema } from '../../validations/post.validation';
 import Post from '../../models/Post';
 import { errorResponse, successResponse } from '../../utils/responses';
-import { BAD_REQUEST, UNAUTHORIZED } from '../../utils/httpStatus';
+import { UNAUTHORIZED } from '../../utils/httpStatus';
 /**
  * Controller to create a new post with an image upload.
  *
- * This function uses Multer to handle file uploads, validates the post data
- * (excluding the file), checks user authentication, and then creates and saves
+ * This function uses Multer to handle file uploads, checks user authentication, and then creates and saves
  * a new post in the database.
  *
  * @param req - Express Request object (expects req.auth.userID from auth middleware)
@@ -16,13 +14,7 @@ import { BAD_REQUEST, UNAUTHORIZED } from '../../utils/httpStatus';
  */
 export const createPost = async (req: Request, res: Response): Promise<Response> => {
   try {
-    // Validate the post data (excluding the file)
-    const validation = postSchema.safeParse(req.body);
-    if (!validation.success) {
-      const errors = validation.error.issues.map((issue) => issue.message);
-      return errorResponse(res, 'Invalid post data', BAD_REQUEST, errors);
-    }
-    const { content } = validation.data;
+    const { content } = req.body;
 
     // Ensure the user is authenticated.
     const author = req.auth?.userID;

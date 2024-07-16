@@ -3,13 +3,11 @@ import argon2 from 'argon2';
 import User from '../../models/User';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
 import { errorResponse, successResponse } from '../../utils/responses';
-import { BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
-import { loginSchema } from '../../validations/user.validation';
+import { NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
 
 /**
  * Controller responsible for authenticating a user and returning a JWT token.
  *
- * - Validate user credentials with Zod
  * - Find user by email in the database
  * - Compare hashed password using Argon2
  * - Generate JWT token on successful login
@@ -21,13 +19,7 @@ import { loginSchema } from '../../validations/user.validation';
  */
 const loginUser = async (req: Request, res: Response): Promise<Response> => {
   try {
-    // Validate input
-    const validation = loginSchema.safeParse(req.body);
-    if (!validation.success) {
-      return errorResponse(res, 'Validation failed.', BAD_REQUEST, validation.error.flatten());
-    }
-
-    const { email, password } = validation.data;
+    const { email, password } = req.body;
 
     // Find user by email
     const user = await User.findOne({ email });

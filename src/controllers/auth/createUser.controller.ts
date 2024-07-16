@@ -3,12 +3,11 @@ import User from '../../models/User';
 import { hash } from '../../utils/argon';
 import generateToken, { TokenGenerationError } from '../../utils/jwt';
 import { errorResponse, successResponse } from '../../utils/responses';
-import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
-import { registerSchema } from '../../validations/user.validation';
+import { CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
 
 /**
  * Controller responsible for handling user registration :
- * - Validates incoming request body using Zod
+ *
  * - Check if email already exists
  * - Hash the password securely
  * - Create and save the new user
@@ -22,13 +21,7 @@ import { registerSchema } from '../../validations/user.validation';
  */
 const createUser = async (req: Request, res: Response): Promise<Response> => {
   try {
-    // Validate input
-    const validation = registerSchema.safeParse(req.body);
-    if (!validation.success) {
-      const errorMessages = validation.error.issues.map((i) => i.message).join(', ');
-      return errorResponse(res, errorMessages, BAD_REQUEST);
-    }
-    const { familyName, name, email, password } = validation.data;
+    const { familyName, name, email, password } = req.body;
 
     // Check for duplicate user
     const existingUser = await User.findOne({ email }).lean();

@@ -2,9 +2,8 @@ import { verify } from 'argon2';
 import { Request, Response } from 'express';
 import path from 'path';
 import User from '../../models/User';
-import { FORBIDDEN, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
+import { FORBIDDEN, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
 import { errorResponse, successResponse } from '../../utils/responses';
-import { loginSchema } from '../../validations/user.validation';
 import { deleteFileIfExists } from '../../utils/files';
 
 /**
@@ -26,16 +25,12 @@ const AVATAR_UPLOADS_DIR = path.join(
  */
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
   try {
+    // Extract password.
+    const { password } = req.body;
+
     // Verify if the user is authenticated.
     if (!req.auth || !req.auth.userID) return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
     const { userID } = req.auth;
-
-    // Extract and validate the provided password.
-    const { password } = req.body;
-    const passwordSchema = loginSchema.shape.password;
-    const validationPassword = passwordSchema.safeParse(password);
-    if (!validationPassword.success)
-      return errorResponse(res, 'Password is required.', BAD_REQUEST);
 
     // Retrieve the user along with the password and profile picture fields.
     const user = await User.findById(userID).select('password profilePicture');

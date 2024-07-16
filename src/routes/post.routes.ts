@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
-import { createPost } from '../controllers/posts/createPost.controller';
 import { createUploadMiddleware } from '../middlewares/upload.middleware';
+import validate from '../middlewares/validate.middleware';
+import { postSchema } from '../validations/post.validation';
+import { createPost } from '../controllers/posts/createPost.controller';
 import { fetchAllPosts } from '../controllers/posts/fetchAllPosts.controller';
 import { fetchPostById } from '../controllers/posts/fetchPostById.controller';
 import { likePost } from '../controllers/posts/likePost.controller';
@@ -18,7 +20,7 @@ const router = Router();
  * @desc    Create a new Post with an optional image file.
  * @access  Private
  */
-router.post('/', filePost, async (req: Request, res: Response) => {
+router.post('/', filePost, validate(postSchema), async (req: Request, res: Response) => {
   await createPost(req, res);
 });
 

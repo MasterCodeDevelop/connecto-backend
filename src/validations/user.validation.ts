@@ -48,6 +48,14 @@ const familyNameField = z
     'Family name can only contain alphabetic characters and spaces.',
   );
 
+const fileNameField = z.string().min(1, 'File name is required');
+
+const fileMimeTypeField = z.string().refine((type) => ['image/jpeg', 'image/png'].includes(type), {
+  message: 'Unsupported file type. Only JPEG and PNG are allowed.',
+});
+
+const fileSizeField = z.number().max(5 * 1024 * 1024, 'File must not exceed 5MB'); // 5MB
+
 /**
  * Schema for user registration (sign-up).
  * Validates full user profile input.
@@ -77,16 +85,27 @@ export const loginSchema = z
 export type LoginDTO = z.infer<typeof loginSchema>;
 
 /**
- * Schema for profile update (optional name/familyName)
- * At least one field is required.
+ * Schema for user profile update.
+ * Requires at least one of:
+ * - name
+ * - familyName
+ * - file (originalname must be valid)
  */
 export const updateProfileSchema = z
   .object({
     name: nameField.optional(),
     familyName: familyNameField.optional(),
+    file: z
+      .object({
+        originalname: fileNameField,
+        mimetype: fileMimeTypeField,
+        size: fileSizeField,
+      })
+      .optional(),
   })
-  .refine((data) => data.name || data.familyName, {
-    message: 'At least one field (name or familyName) must be provided.',
+  .refine(({ name, familyName, file }) => !!name || !!familyName || !!file?.originalname, {
+    message: 'At least one of name, familyName, or file must be provided.',
+    path: ['name', 'familyName', 'file'],
   });
 
 /**
@@ -108,5 +127,19 @@ export const passwordSchema = z
     message: 'The new password must be different from the current password.',
     path: ['newPassword'],
   });
+
+/**
+ * Schema for deleting a user account.
+ *
+ * This schema enforces that:
+ * - The provided password meets the defined validation rules.
+ *
+ * The `strict()` method is used to disallow any extra keys in the object.
+ */
+export const deleteUserSchema = z
+  .object({
+    password: passwordField,
+  })
+  .strict();
 
 export type UpdateProfileDTO = z.infer<typeof updateProfileSchema>;

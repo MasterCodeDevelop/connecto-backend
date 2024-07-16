@@ -3,7 +3,6 @@ import path from 'path';
 import User from '../../models/User';
 import { errorResponse, successResponse } from '../../utils/responses';
 import { BAD_REQUEST, NOT_FOUND, FORBIDDEN } from '../../utils/httpStatus';
-import { updateProfileSchema } from '../../validations/user.validation';
 import { deleteFileIfExists } from '../../utils/files';
 
 /**
@@ -29,15 +28,10 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<Re
   try {
     const userID = req.auth?.userID;
     const newProfilePicture = req.file ? req.file.filename : undefined;
+    const { name, familyName } = req.body;
 
     //Ensure authenticated user
     if (!userID) return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
-
-    // Validate input fields with Zod
-    const validation = updateProfileSchema.safeParse(req.body);
-    if (!validation.success && !newProfilePicture)
-      return errorResponse(res, 'Validation failed.', BAD_REQUEST, validation.error.flatten());
-    const { name, familyName } = validation.success ? validation.data : {};
 
     // Fetch current user
     const user = await User.findById(userID);
