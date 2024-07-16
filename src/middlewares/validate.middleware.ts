@@ -12,11 +12,16 @@ import { BAD_REQUEST } from '../utils/httpStatus';
 const validate = (schema: ZodSchema): RequestHandler => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      // Validate the request body
-      schema.parse({
-        ...req.body,
-        file: req.file,
-      });
+      // Parse the request body and file
+      const parsed = req.file
+        ? {
+            ...req.body,
+            file: req.file,
+          }
+        : req.body;
+
+      // Validate the parsed data
+      schema.parse(parsed);
 
       // Pass the request to the next middleware
       next();
