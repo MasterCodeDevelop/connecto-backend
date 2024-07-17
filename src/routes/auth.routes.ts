@@ -1,8 +1,8 @@
-import { Router, Request, Response } from 'express';
-import createUser from '../controllers/auth/createUser.controller';
-import loginUser from '../controllers/auth/loginUser.controller';
-import validate from '../middlewares/validate.middleware';
-import { registerSchema, loginSchema } from '../validations/user.validation';
+import { Router } from 'express';
+import { validate } from '@/middlewares';
+import { registerSchema, loginSchema } from '@/validations/user.validation';
+import { asyncHandler } from '@/utils';
+import { createUser, loginUser } from '@/controllers';
 
 const router = Router();
 
@@ -11,17 +11,13 @@ const router = Router();
  * @desc    Create a new user account
  * @access  Public
  */
-router.post('/signup', validate(registerSchema), async (req: Request, res: Response) => {
-  await createUser(req, res);
-});
+router.post('/signup', validate(registerSchema), asyncHandler(createUser));
 
 /**
  * @route   POST /login
  * @desc    Authenticate user and return token
  * @access  Public
  */
-router.post('/login', validate(loginSchema), async (req: Request, res: Response) => {
-  await loginUser(req, res);
-});
+router.post('/login', validate(loginSchema), asyncHandler(loginUser));
 
 export default router;

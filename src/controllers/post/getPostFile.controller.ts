@@ -1,8 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { Request, Response } from 'express';
-import { NOT_FOUND, BAD_REQUEST } from '../../utils/httpStatus';
-import { errorResponse } from '../../utils/responses';
+import { BadRequestError, NotFoundError } from '@/errors';
 
 /**
  * Base upload directory, configurable via .env or defaults to `private/uploads`
@@ -24,16 +23,16 @@ const POST_UPLOADS_DIR = path.join(
  * @param res - Express response object
  * @returns The image file or error
  */
-export const getPostFile = (req: Request, res: Response): Response | void => {
+export const getPostFile = async (req: Request, res: Response): Promise<Response | void> => {
   const { filename } = req.params;
   const filePath = path.join(POST_UPLOADS_DIR, filename);
 
   // Security check: prevent directory traversal and restrict extensions
   const isValidFilename = /^[\w-]+\.(jpg|jpeg|png|webp)$/i.test(filename);
-  if (!isValidFilename) return errorResponse(res, 'Invalid post filename format.', BAD_REQUEST);
+  if (!isValidFilename) throw new BadRequestError('Invalid post filename format.');
 
   // File not found
-  if (!fs.existsSync(filePath)) return errorResponse(res, 'Post file not found.', NOT_FOUND);
+  if (!fs.existsSync(filePath)) throw new NotFoundError('Post file not found.');
 
   // erve the file securely
   return res.sendFile(filePath);

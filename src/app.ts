@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { corsOptions } from './config/corsConfig';
 import router from './routes';
+import { errorHandler } from './middlewares';
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -36,8 +38,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /**
- * Routes
+ * API routes are prefixed with '/api'
  */
-app.use('/api', router); // toutes les routes seront sous /api/...
+app.use('/api', router);
+
+//  Mount the global error handler (MUST be last)
+app.use(errorHandler);
 
 export default app;

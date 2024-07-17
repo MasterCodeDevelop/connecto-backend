@@ -24,7 +24,7 @@ type JwtDuration = '1h' | '2h' | '6h' | '12h' | '1d' | '7d' | '30d';
  * @returns A Promise resolving to a signed JWT string
  * @throws TokenGenerationError if JWT_SECRET is missing or signing fails
  */
-const generateToken = async (payload: object): Promise<string> => {
+export const generateToken = async (payload: object): Promise<string> => {
   // Retrieve the JWT secret key from environment variables
   const jwtSecret = process.env.JWT_SECRET;
 
@@ -50,5 +50,3 @@ const generateToken = async (payload: object): Promise<string> => {
     });
   });
 };
-
-export default generateToken;

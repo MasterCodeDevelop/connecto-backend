@@ -1,9 +1,7 @@
-import { Request, Response } from 'express';
-import User from '../../models/User';
-import { hash } from '../../utils/argon';
-import generateToken, { TokenGenerationError } from '../../utils/jwt';
-import { errorResponse, successResponse } from '../../utils/responses';
-import { CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus';
+import { Request, Response, NextFunction } from 'express';
+import User from '@/models/User';
+import { hash, generateToken, successResponse, CREATED } from '@/utils';
+import { ConflictError, InternalError } from '@/errors';
 
 /**
  * Controller responsible for handling user registration :
@@ -19,55 +17,32 @@ import { CREATED, INTERNAL_SERVER_ERROR, CONFLICT } from '../../utils/httpStatus
  * @param res - Express response object
  * @returns Express response with status and data
  */
-const createUser = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const { familyName, name, email, password } = req.body;
+export const createUser = async (
+  req: Request,
+  res: Response,
+): Promise<Response | NextFunction | void> => {
+  const { familyName, name, email, password } = req.body;
 
-    // Check for duplicate user
-    const existingUser = await User.findOne({ email }).lean();
-    if (existingUser) return errorResponse(res, 'This email already exists.', CONFLICT);
+  // Check for duplicate user
+  const existingUser = await User.findOne({ email }).lean();
+  if (existingUser) throw new ConflictError('This email already exists.');
 
-    // Hash the password using Argon2
-    const hashedPassword = await hash(password);
+  // Hash the password using Argon2
+  const hashedPassword = await hash(password);
+  if (!hashedPassword) throw new InternalError('Password hashing failed.');
 
-    // Create and save the new user in the database
-    const newUser = await User.create({
-      name,
-      familyName,
-      email,
-      password: hashedPassword,
-    });
+  // Create and save the new user in the database
+  const newUser = await User.create({
+    name,
+    familyName,
+    email,
+    password: hashedPassword,
+  });
 
-    // Generate a JWT token for the newly registered user
-    try {
-      const token = await generateToken({ userID: newUser._id });
+  // Generate a JWT token for the newly registered user
+  const token = await generateToken({ userID: newUser._id });
+  if (!token) throw new InternalError('JWT signing failed.');
 
-      // Return success response
-      return successResponse(res, 'User created successfully.', { token }, CREATED);
-
-      // Handle unexpected errors
-    } catch (err: unknown) {
-      // Handle JWT-specific failures
-      if (err instanceof TokenGenerationError) {
-        console.error('[createUser] Token generation error:', err.message);
-        return errorResponse(res, 'Token generation failed. Please try again later.');
-      }
-
-      // Fallback for unexpected errors during token creation
-      console.error('[createUser] Unexpected error during token creation:', err);
-      return errorResponse(res, 'An unexpected error occurred during token generation.');
-    }
-
-    // Global error handler for registration flow
-  } catch (err: unknown) {
-    console.error('[createUser] Registration error:', err);
-    return errorResponse(
-      res,
-      'Registration failed. Please try again later.',
-      INTERNAL_SERVER_ERROR,
-      err,
-    );
-  }
+  // Return success response
+  return successResponse(res, 'User created successfully.', { token }, CREATED);
 };
-
-export default createUser;

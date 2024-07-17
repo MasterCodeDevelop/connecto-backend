@@ -1,9 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import { authMiddleware, urlTokenAuthMiddleware } from '@/middlewares';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
 import fileRoutes from './file.routes';
-import authMiddleware from '../middlewares/auth.middleware';
-import urlTokenAuthMiddleware from '../middlewares/urlTokenAuth.middleware';
 import postRoutes from './post.routes';
 
 const router = Router();

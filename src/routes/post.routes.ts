@@ -1,11 +1,8 @@
-import { Router, Request, Response } from 'express';
-import { createUploadMiddleware } from '../middlewares/upload.middleware';
-import validate from '../middlewares/validate.middleware';
-import { postSchema } from '../validations/post.validation';
-import { createPost } from '../controllers/posts/createPost.controller';
-import { fetchAllPosts } from '../controllers/posts/fetchAllPosts.controller';
-import { fetchPostById } from '../controllers/posts/fetchPostById.controller';
-import { likePost } from '../controllers/posts/likePost.controller';
+import { Router } from 'express';
+import { createUploadMiddleware, validate } from '@/middlewares';
+import { postSchema } from '@/validations/post.validation';
+import { asyncHandler } from '@/utils';
+import { createPost, fetchAllPosts, fetchPostById, likePost } from '@/controllers';
 
 // Create middleware for handling file uploads.
 const filePost = createUploadMiddleware('image', 'posts').single;
@@ -20,9 +17,7 @@ const router = Router();
  * @desc    Create a new Post with an optional image file.
  * @access  Private
  */
-router.post('/', filePost, validate(postSchema), async (req: Request, res: Response) => {
-  await createPost(req, res);
-});
+router.post('/', filePost, validate(postSchema), asyncHandler(createPost));
 
 /**
  * This route fetches all posts from the database.
@@ -31,9 +26,7 @@ router.post('/', filePost, validate(postSchema), async (req: Request, res: Respo
  * @desc    Fetch all posts from the database.
  * @access  Private
  */
-router.get('/', async (req: Request, res: Response) => {
-  await fetchAllPosts(req, res);
-});
+router.get('/', asyncHandler(fetchAllPosts));
 
 /**
  * This route fetches a specific post by its ID.
@@ -42,9 +35,7 @@ router.get('/', async (req: Request, res: Response) => {
  * @desc    Fetch a specific post by its ID.
  * @access  Private
  */
-router.get('/:id', async (req: Request, res: Response) => {
-  await fetchPostById(req, res);
-});
+router.get('/:id', asyncHandler(fetchPostById));
 
 /**
  * This route allows a user to like or unlike a post.
@@ -53,8 +44,6 @@ router.get('/:id', async (req: Request, res: Response) => {
  * @desc    Like or unlike a post.
  * @access  Private
  */
-router.patch('/:id/like', async (req: Request, res: Response) => {
-  likePost(req, res);
-});
+router.patch('/:id/like', asyncHandler(likePost));
 
 export default router;

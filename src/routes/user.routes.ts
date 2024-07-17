@@ -1,15 +1,12 @@
-import { Router, Request, Response } from 'express';
-import { createUploadMiddleware } from '../middlewares/upload.middleware';
-import validate from '../middlewares/validate.middleware';
+import { Router } from 'express';
+import { createUploadMiddleware, validate } from '@/middlewares';
 import {
   passwordSchema,
   deleteUserSchema,
   updateProfileSchema,
-} from '../validations/user.validation';
-import { getUserProfile } from '../controllers/user/getUserProfile.controller';
-import { updateUserProfile } from '../controllers/user/updateUserProfile.controller';
-import { updatePassword } from '../controllers/user/updatePassword.controller';
-import { deleteUser } from '../controllers/user/deleteUser.controller';
+} from '@/validations/user.validation';
+import { asyncHandler } from '@/utils';
+import { getUserProfile, updateUserProfile, updatePassword, deleteUser } from '@/controllers';
 
 // Middleware to handle profile picture upload
 const avatarUpload = createUploadMiddleware('image', 'users').single;
@@ -22,9 +19,7 @@ const router = Router();
  * @desc    Fetch user profile using a valid token
  * @access  Private
  */
-router.get('/profile', async (req: Request, res: Response) => {
-  await getUserProfile(req, res);
-});
+router.get('/profile', asyncHandler(getUserProfile));
 
 /**
  * @route   PATCH /api/user/profile
@@ -35,9 +30,7 @@ router.patch(
   '/profile',
   avatarUpload,
   validate(updateProfileSchema),
-  async (req: Request, res: Response) => {
-    await updateUserProfile(req, res);
-  },
+  asyncHandler(updateUserProfile),
 );
 
 /**
@@ -45,16 +38,12 @@ router.patch(
  * @desc    Updates the user's password.
  * @access  Private (JWT required)
  */
-router.put('/password', validate(passwordSchema), async (req: Request, res: Response) => {
-  await updatePassword(req, res);
-});
+router.put('/password', validate(passwordSchema), asyncHandler(updatePassword));
 
 /**
  * @route   DELETE /api/user
  * @desc    Deletes the user account and its associated files.
  * @access  Private
  */
-router.delete('/', validate(deleteUserSchema), async (req: Request, res: Response) => {
-  await deleteUser(req, res);
-});
+router.delete('/', validate(deleteUserSchema), asyncHandler(deleteUser));
 export default router;

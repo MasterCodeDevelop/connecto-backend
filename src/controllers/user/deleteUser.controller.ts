@@ -1,10 +1,9 @@
 import { verify } from 'argon2';
 import { Request, Response } from 'express';
 import path from 'path';
-import User from '../../models/User';
-import { FORBIDDEN, NOT_FOUND, UNAUTHORIZED } from '../../utils/httpStatus';
-import { errorResponse, successResponse } from '../../utils/responses';
-import { deleteFileIfExists } from '../../utils/files';
+import User from '@/models/User';
+import { successResponse, deleteFileIfExists } from '@/utils';
+import { AuthError, NotFoundError, UnauthorizedError } from '@/errors';
 
 /**
  * Directory for avatar uploads.
@@ -24,37 +23,31 @@ const AVATAR_UPLOADS_DIR = path.join(
  * @returns {Promise<Response>} A promise that resolves to an HTTP response.
  */
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
-  try {
-    // Extract password.
-    const { password } = req.body;
+  // Extract password.
+  const { password } = req.body;
 
-    // Verify if the user is authenticated.
-    if (!req.auth || !req.auth.userID) return errorResponse(res, 'Unauthorized access.', FORBIDDEN);
-    const { userID } = req.auth;
+  // Ensure authentication
+  const userID = req.auth?.userID;
+  if (!userID) throw new AuthError();
 
-    // Retrieve the user along with the password and profile picture fields.
-    const user = await User.findById(userID).select('password profilePicture');
-    if (!user) return errorResponse(res, 'This user does not exist.', NOT_FOUND);
+  // Retrieve the user along with the password and profile picture fields.
+  const user = await User.findById(userID).select('password profilePicture');
+  if (!user) throw new NotFoundError('User not found.');
 
-    // Verify that the provided password matches the stored hash.
-    const valid = await verify(user.password, password);
-    if (!valid) return errorResponse(res, 'Incorrect password.', UNAUTHORIZED);
+  // Verify that the provided password matches the stored hash.
+  const valid = await verify(user.password, password);
+  if (!valid) throw new UnauthorizedError('Incorrect password.');
 
-    // Delete the profile picture if it is not the default avatar.
-    if (user.profilePicture !== 'avatar.png') {
-      const filePath = path.join(AVATAR_UPLOADS_DIR, user.profilePicture as string);
-      await deleteFileIfExists(filePath);
-    }
-
-    // Permanently delete the user account.
-    await User.findByIdAndDelete(userID);
-
-    // Return a success response.
-    return successResponse(res, 'Your account has been deleted.');
-
-    // Catch any errors that occur during the process.
-  } catch (error) {
-    console.error('Delete user error:', error);
-    return errorResponse(res, 'An error occurred while deleting the account.');
+  // Delete the profile picture if it is not the default avatar.
+  if (user.profilePicture !== 'avatar.png') {
+    const filePath = path.join(AVATAR_UPLOADS_DIR, user.profilePicture as string);
+    await deleteFileIfExists(filePath);
   }
+
+  // Permanently delete the user account.
+  const deletedUser = await User.findByIdAndDelete(userID);
+  if (!deletedUser) throw new NotFoundError('User not found or already deleted.');
+
+  // Return a success response.
+  return successResponse(res, 'Your account has been deleted.');
 };

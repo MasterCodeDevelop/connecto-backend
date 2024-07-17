@@ -1,6 +1,6 @@
-import { Router, Request, Response } from 'express';
-import { getUserAvatar } from '../controllers/user/getUserAvatar.controller';
-import { getPostFile } from '../controllers/posts/getPostFile.controller';
+import { Router } from 'express';
+import { asyncHandler } from '@/utils';
+import { getUserAvatar, getPostFile } from '@/controllers';
 
 const router = Router();
 
@@ -13,9 +13,7 @@ const router = Router();
  * @desc    Securely serves user profile pictures (avatars) via signed token in query
  * @access  Protected by token (via query string)
  */
-router.get('/user/avatar/:filename', (req: Request, res: Response) => {
-  getUserAvatar(req, res);
-});
+router.get('/user/avatar/:filename', asyncHandler(getUserAvatar));
 
 /**
  * Route to serve a post's file from the private storage.
@@ -26,7 +24,5 @@ router.get('/user/avatar/:filename', (req: Request, res: Response) => {
  * @desc    Securely serves post files via signed token in query
  * @access  Protected by token (via query string)
  */
-router.get('/post/:filename', (req: Request, res: Response) => {
-  getPostFile(req, res);
-});
+router.get('/post/:filename', asyncHandler(getPostFile));
 export default router;
