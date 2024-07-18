@@ -1,5 +1,5 @@
 import { CorsOptions } from 'cors';
-import { color } from '../utils/color';
+import { logger } from './logger';
 
 // Load CORS origins from environment or default to "*"
 const envOrigins = process.env.CORS_ORIGINS || '*';
@@ -33,12 +33,12 @@ const parseOrigins = (value: string): string[] => {
 export const corsOptions = (): CorsOptions => {
   // Public mode: allow all origins (e.g., for local dev or open APIs)
   if (envOrigins === '*') {
-    console.log(color.cyan('🌐 CORS: Public mode enabled (any origin allowed)'));
+    logger.debug('CORS: Public mode enabled (any origin allowed)');
     return {
       origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
-      credentials: false, // ⚠️ Must be false when origin is "*"
+      credentials: false,
     };
   }
 
@@ -48,7 +48,7 @@ export const corsOptions = (): CorsOptions => {
     origin: (origin, callback) => {
       // Handle non-browser tools like Postman or curl (no Origin header)
       if (!origin) {
-        console.log(color.yellow('📥 CORS: Request without origin (CLI or Postman)'));
+        logger.warn('CORS: Request without origin (CLI or Postman)');
         return callback(null, true);
       }
 
@@ -58,7 +58,7 @@ export const corsOptions = (): CorsOptions => {
       }
 
       // Deny access and log the unauthorized origin
-      console.warn(color.red(`❌ CORS: Access denied for origin: ${origin}`));
+      logger.error(`CORS: Access denied for origin: ${origin}`);
       return callback(new Error(`CORS access denied for origin: ${origin}`));
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

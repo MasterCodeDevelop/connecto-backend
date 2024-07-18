@@ -1,4 +1,21 @@
-pnpm-lock.yaml
+# --- Dependency directories ---
 node_modules/
-_private/
+.pnpm/
+
+# --- Lock files ---
+pnpm-lock.yaml
+
+# --- Environment variables ---
 .env
+
+# --- Build output ---
+dist/
+build/
+out/
+
+# --- Logs and debug files ---
+logs/
+*.log
+
+# --- Private or sensitive folders ---
+_private/

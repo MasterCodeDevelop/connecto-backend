@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { corsOptions } from './config/corsConfig';
 import router from './routes';
-import { errorHandler } from './middlewares';
+import { errorHandler, morganMiddleware } from './middlewares';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -27,6 +27,9 @@ app.use(
     crossOriginEmbedderPolicy: false,
   }),
 );
+
+// HTTP request logging middleware
+app.use(morganMiddleware);
 
 // Enable Cross-Origin Resource Sharing with custom options
 app.use(cors(corsOptions()));

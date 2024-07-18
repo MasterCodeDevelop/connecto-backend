@@ -32,7 +32,7 @@ export const authMiddleware = (
   next: NextFunction,
 ): void | Response => {
   const { authorization } = req.headers;
-  const jwtSecret = process.env.JWT_SECRET; // Secret key for JWT verification
+  const jwtSecret = process.env.JWT_SECRET;
 
   try {
     // Ensure the Authorization header exists and is correctly formatted
@@ -60,6 +60,22 @@ export const authMiddleware = (
 
     //  Handle Errors
   } catch (error) {
-    next(error);
+    if (error instanceof Error) {
+      // Handle TokenExpiredError
+      if (error.name === 'TokenExpiredError') {
+        return next(new UnauthorizedError('Session expired. Please log in again.'));
+      }
+
+      // Handle JsonWebTokenError
+      if (error.name === 'JsonWebTokenError') {
+        return next(new UnauthorizedError('Invalid token format.'));
+      }
+
+      // Handle NotBeforeError
+      if (error.name === 'NotBeforeError') {
+        return next(new UnauthorizedError('Token not active yet.'));
+      }
+    }
+    return next(error);
   }
 };

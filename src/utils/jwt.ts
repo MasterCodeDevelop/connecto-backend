@@ -1,50 +1,52 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt, { SignOptions, Secret } from 'jsonwebtoken';
+import { InternalError } from '@/errors';
 
 /**
- * Custom error for handling JWT generation failures.
- * Allows clear distinction from other runtime errors.
- */
-export class TokenGenerationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'TokenGenerationError';
-  }
-}
-
-/**
- * Supported JWT expiration durations.
- * Helps ensure that only valid and intentional durations are used.
- */
-type JwtDuration = '1h' | '2h' | '6h' | '12h' | '1d' | '7d' | '30d';
-
-/**
- * Generates a signed JWT access token for a given payload.
+ * Validates whether a string is a valid JWT expiration format.
+ * Accepts formats like '1h', '2d', '60'etc.
  *
- * @param payload - The data to embed in the JWT (e.g., user ID, role, etc.)
- * @returns A Promise resolving to a signed JWT string
- * @throws TokenGenerationError if JWT_SECRET is missing or signing fails
+ * @param value - The string to validate.
+ * @returns True if the string is a valid JWT expiration format, false otherwise.
+ */
+const isValidJwtDuration = (value: string): boolean => {
+  return /^[1-9]\d*\s*(s|m|h|d|w|y|ms)?$/.test(value.trim()); // ex: "1h", "2d", "30d"
+};
+/**
+ * Environment configuration keys for JWT settings.
+ */
+const getJwtConfig = (): { secret: Secret; expiresIn: string } => {
+  const secret = process.env.JWT_SECRET;
+  const rawExpiresIn = process.env.JWT_EXPIRES_IN?.trim() || '1h';
+
+  if (!secret) {
+    throw new InternalError('Missing JWT_SECRET in environment variables.');
+  }
+  if (!isValidJwtDuration(rawExpiresIn)) {
+    throw new InternalError(`Invalid JWT_EXPIRES_IN value: "${rawExpiresIn}"`);
+  }
+
+  return { secret, expiresIn: rawExpiresIn };
+};
+
+/**
+ * Generates a signed JWT token asynchronously.
+ *
+ * @param payload - The payload to embed inside the token (e.g., user ID, roles, permissions).
+ * @returns Promise<string> - The signed JWT token.
+ * @throws TokenGenerationError if the secret is missing or signing fails.
  */
 export const generateToken = async (payload: object): Promise<string> => {
-  // Retrieve the JWT secret key from environment variables
-  const jwtSecret = process.env.JWT_SECRET;
+  const { secret, expiresIn } = getJwtConfig();
 
-  // Retrieve the expiration duration or fallback to a default value
-  const jwtExpiresIn = (process.env.JWT_EXPIRES_IN || '1h') as JwtDuration;
+  const signOptions: SignOptions = {
+    expiresIn: expiresIn as SignOptions['expiresIn'],
+    algorithm: 'HS256',
+  };
 
-  // Validate presence of secret
-  if (!jwtSecret) {
-    throw new TokenGenerationError('JWT_SECRET is not defined in environment variables.');
-  }
-
-  const signOptions: SignOptions = { expiresIn: jwtExpiresIn };
-
-  // Wrap the async signing process in a Promise for clean async/await usage
   return new Promise((resolve, reject) => {
-    jwt.sign(payload, jwtSecret, signOptions, (err, token) => {
+    jwt.sign(payload, secret, signOptions, (err, token) => {
       if (err || !token) {
-        return reject(
-          new TokenGenerationError(`JWT signing failed: ${err?.message ?? 'Unknown error'}`),
-        );
+        return reject(new InternalError(`JWT signing failed: ${err?.message ?? 'Unknown error'}`));
       }
       resolve(token);
     });
