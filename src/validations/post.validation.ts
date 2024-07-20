@@ -1,9 +1,14 @@
+import mongoose from 'mongoose';
 import { z } from 'zod';
 
+/* -------------------------------------------------------------------------- */
+/*                                Field Validators                            */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Define the validation for the "content" field.
+ * Validates that the content is a non-empty string between 10 and 5000 characters.
  */
-const contentField = z
+const content = z
   .string({
     required_error: 'Content is required.',
   })
@@ -11,42 +16,69 @@ const contentField = z
   .max(5000, 'Content cannot exceed 5000 characters.');
 
 /**
- * Field validation: file.originalname
+ * Validates that the file name is a non-empty string.
  */
-const fileNameField = z.string().min(1, 'File name is required');
+const fileName = z.string().min(1, 'File name is required');
 
 /**
- * Field validation: file.mimetype
- * Only accepts JPEG and PNG.
+ * Validates the file's MIME type.
+ * Only JPEG and PNG formats are accepted.
  */
-const fileMimeTypeField = z.string().refine((type) => ['image/jpeg', 'image/png'].includes(type), {
+const fileMimeType = z.string().refine((type) => ['image/jpeg', 'image/png'].includes(type), {
   message: 'Unsupported file type. Only JPEG and PNG are allowed.',
 });
 
 /**
- * Field validation: file.size
- * Maximum file size: 5MB
+ * Validates the file size.
+ * The maximum allowed size is 5MB.
  */
-const fileSizeField = z.number().max(5 * 1024 * 1024, 'File must not exceed 5MB');
+const fileSize = z.number().max(5 * 1024 * 1024, 'File must not exceed 5MB');
 
 /**
- * Schema for post.
- * Requires content and an optional file.
+ * Validates that the post ID is a valid MongoDB ObjectId.
+ * Leverages Mongoose's built-in ID validation.
+ */
+export const id = z
+  .string()
+  .min(1, 'ID is required')
+  .refine((value) => mongoose.Types.ObjectId.isValid(value), { message: 'Invalid ID format' });
+
+/* -------------------------------------------------------------------------- */
+/*                               Composite Schema                             */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Schema for a post.
+ * Requires a valid content field.
+ * Optionally accepts a file object with original name, MIME type, and size.
  */
 export const postSchema = z
   .object({
-    content: contentField,
+    content,
     file: z
       .object({
-        originalname: fileNameField,
-        mimetype: fileMimeTypeField,
-        size: fileSizeField,
+        originalname: fileName,
+        mimetype: fileMimeType,
+        size: fileSize,
       })
       .optional(),
   })
   .strict();
 
 /**
- * Type definition for post.
+ * Type definition for post form data.
  */
 export type PostFormData = z.infer<typeof postSchema>;
+
+/**
+ * Schema for validating the "id" parameter in the request.
+ * Ensures that the id is a non-empty string and conforms to MongoDB's ObjectId format.
+ */
+export const postIdSchema = z.object({
+  id,
+});
+
+/**
+ * Type definition for the validated parameters.
+ */
+export type PostId = z.infer<typeof postIdSchema>;

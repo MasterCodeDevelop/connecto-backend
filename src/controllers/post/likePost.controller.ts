@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import Post from '@/models/Post';
 import { successResponse } from '@/utils';
-import { BadRequestError, AuthError, NotFoundError } from '@/errors';
+import { NotFoundError } from '@/errors';
 
 /**
  * Controller to like or unlike a post.
@@ -15,16 +15,12 @@ import { BadRequestError, AuthError, NotFoundError } from '@/errors';
  * @returns {Promise<Response>} - Returns the updated post or an error response
  */
 export const likePost = async (req: Request, res: Response): Promise<Response | void> => {
-  // Extract & validate post ID
-  const postID = req.params.id;
-  if (!postID) throw new BadRequestError('Post ID is required.');
-
-  // Extract & validate user ID
-  const userID = req.auth?.userID;
-  if (!userID) throw new AuthError();
+  // Extractpost ID and user ID
+  const { id } = req.params;
+  const { userID } = req.auth!;
 
   // Query the database for the post by ID and populate the "author" field.
-  const post = await Post.findById(postID).populate('author', 'name familyName profilePicture');
+  const post = await Post.findById(id).populate('author', 'name familyName profilePicture');
   if (!post) throw new NotFoundError('Post not found.');
 
   // User's like/unlike logic

@@ -12,16 +12,6 @@ export class BadRequestError extends HttpError {
 }
 
 /**
- * Error thrown when a user is not authenticated.
- * Corresponds to HTTP status 401.
- */
-export class AuthError extends HttpError {
-  constructor(message = 'User not authenticated', details?: unknown) {
-    super(message, UNAUTHORIZED, details);
-  }
-}
-
-/**
  * Error thrown when a user lacks the required permissions.
  * Corresponds to HTTP status 401.
  */

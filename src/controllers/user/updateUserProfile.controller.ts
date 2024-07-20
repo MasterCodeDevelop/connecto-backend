@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import User from '@/models/User';
 import { successResponse, deleteFileIfExists } from '@/utils';
-import { AuthError, NotFoundError, BadRequestError } from '@/errors';
+import { NotFoundError, BadRequestError } from '@/errors';
 
 /**
  * Base upload directory, configurable via .env or defaults to `private/uploads`
@@ -24,12 +24,10 @@ const filePath = path.join(
  * @returns Updated user info or error
  */
 export const updateUserProfile = async (req: Request, res: Response): Promise<Response | void> => {
-  const newProfilePicture = req.file ? req.file.filename : undefined;
+  // Extract authenticated user ID, uploaded file (if any), and form data
+  const { userID } = req.auth!;
+  const newProfilePicture = req.file?.filename;
   const { name, familyName } = req.body;
-
-  // Ensure authentication
-  const userID = req.auth?.userID;
-  if (!userID) throw new AuthError();
 
   // Fetch current user
   const user = await User.findById(userID);

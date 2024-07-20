@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Post from '@/models/Post';
 import { successResponse } from '@/utils';
-import { BadRequestError, NotFoundError } from '@/errors';
+import { NotFoundError } from '@/errors';
 
 /**
  * Controller to fetch a post by its ID.
@@ -15,12 +15,11 @@ import { BadRequestError, NotFoundError } from '@/errors';
  * @returns {Promise<Response>} A promise resolving to a JSON response.
  */
 export const fetchPostById = async (req: Request, res: Response): Promise<Response | void> => {
-  // Extract & validate post ID
-  const postID = req.params.id;
-  if (!postID) throw new BadRequestError('Post ID is required.');
+  // Extract post ID
+  const { id } = req.params;
 
   // Query the database for the post by ID and populate the "author" field.
-  const post = await Post.findById(postID).populate('author', 'name familyName profilePicture');
+  const post = await Post.findById(id).populate('author', 'name familyName profilePicture');
   if (!post) throw new NotFoundError('Post not found.');
 
   // Return the post data with a successful status code.

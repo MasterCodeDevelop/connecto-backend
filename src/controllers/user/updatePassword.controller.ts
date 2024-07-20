@@ -2,7 +2,7 @@ import argon2 from 'argon2';
 import { Request, Response } from 'express';
 import User from '@/models/User';
 import { hash, successResponse } from '@/utils';
-import { AuthError, NotFoundError, UnauthorizedError, InternalError } from '@/errors';
+import { NotFoundError, UnauthorizedError, InternalError } from '@/errors';
 
 /**
  * Updates the user's password.
@@ -29,11 +29,9 @@ import { AuthError, NotFoundError, UnauthorizedError, InternalError } from '@/er
  *
  */
 export const updatePassword = async (req: Request, res: Response): Promise<Response | void> => {
+  // Extract user ID, current password, and new password
+  const { userID } = req.auth!;
   const { password, newPassword } = req.body;
-
-  // Ensure authentication
-  const userID = req.auth?.userID;
-  if (!userID) throw new AuthError();
 
   // Retrieve the user's current password from the database
   const user = await User.findById(userID).select('password');

@@ -1,9 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authMiddleware, urlTokenAuthMiddleware } from '@/middlewares';
+import { authMiddleware, urlTokenAuthMiddleware, validate } from '@/middlewares';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
 import fileRoutes from './file.routes';
 import postRoutes from './post.routes';
+import { authSchema } from '@/validations/auth.validation';
 
 const router = Router();
 
@@ -38,6 +39,7 @@ router.use(
   (req: Request, res: Response, next: NextFunction) => {
     authMiddleware(req, res, next);
   },
+  validate({ auth: authSchema }),
   userRoutes,
 );
 
@@ -51,6 +53,7 @@ router.use(
   (req: Request, res: Response, next: NextFunction) => {
     authMiddleware(req, res, next);
   },
+  validate({ auth: authSchema }),
   postRoutes,
 );
 

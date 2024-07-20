@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createUploadMiddleware, validate } from '@/middlewares';
-import { postSchema } from '@/validations/post.validation';
+import { postIdSchema, postSchema } from '@/validations/post.validation';
 import { asyncHandler } from '@/utils';
 import { createPost, fetchAllPosts, fetchPostById, likePost } from '@/controllers';
 
@@ -17,7 +17,7 @@ const router = Router();
  * @desc    Create a new Post with an optional image file.
  * @access  Private
  */
-router.post('/', filePost, validate(postSchema), asyncHandler(createPost));
+router.post('/', filePost, validate({ body: postSchema }), asyncHandler(createPost));
 
 /**
  * This route fetches all posts from the database.
@@ -35,7 +35,7 @@ router.get('/', asyncHandler(fetchAllPosts));
  * @desc    Fetch a specific post by its ID.
  * @access  Private
  */
-router.get('/:id', asyncHandler(fetchPostById));
+router.get('/:id', validate({ params: postIdSchema }), asyncHandler(fetchPostById));
 
 /**
  * This route allows a user to like or unlike a post.
@@ -44,6 +44,6 @@ router.get('/:id', asyncHandler(fetchPostById));
  * @desc    Like or unlike a post.
  * @access  Private
  */
-router.patch('/:id/like', asyncHandler(likePost));
+router.patch('/:id/like', validate({ params: postIdSchema }), asyncHandler(likePost));
 
 export default router;

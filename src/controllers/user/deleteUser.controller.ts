@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import path from 'path';
 import User from '@/models/User';
 import { successResponse, deleteFileIfExists } from '@/utils';
-import { AuthError, NotFoundError, UnauthorizedError } from '@/errors';
+import { NotFoundError, UnauthorizedError } from '@/errors';
 
 /**
  * Directory for avatar uploads.
@@ -23,12 +23,9 @@ const AVATAR_UPLOADS_DIR = path.join(
  * @returns {Promise<Response>} A promise that resolves to an HTTP response.
  */
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
-  // Extract password.
+  // Extract userID and password.
+  const { userID } = req.auth!;
   const { password } = req.body;
-
-  // Ensure authentication
-  const userID = req.auth?.userID;
-  if (!userID) throw new AuthError();
 
   // Retrieve the user along with the password and profile picture fields.
   const user = await User.findById(userID).select('password profilePicture');

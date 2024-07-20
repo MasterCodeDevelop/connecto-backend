@@ -29,7 +29,7 @@ router.get('/profile', asyncHandler(getUserProfile));
 router.patch(
   '/profile',
   avatarUpload,
-  validate(updateProfileSchema),
+  validate({ body: updateProfileSchema }),
   asyncHandler(updateUserProfile),
 );
 
@@ -38,12 +38,12 @@ router.patch(
  * @desc    Updates the user's password.
  * @access  Private (JWT required)
  */
-router.put('/password', validate(passwordSchema), asyncHandler(updatePassword));
+router.put('/password', validate({ body: passwordSchema }), asyncHandler(updatePassword));
 
 /**
  * @route   DELETE /api/user
  * @desc    Deletes the user account and its associated files.
  * @access  Private
  */
-router.delete('/', validate(deleteUserSchema), asyncHandler(deleteUser));
+router.delete('/', validate({ body: deleteUserSchema }), asyncHandler(deleteUser));
 export default router;

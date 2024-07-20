@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import Post from '@/models/Post';
 import { successResponse } from '@/utils';
-import { AuthError } from '@/errors';
 
 /**
  * Controller to create a new post with an image upload.
@@ -14,19 +13,15 @@ import { AuthError } from '@/errors';
  * @returns {Promise<Response>} - Returns the created post or an error response
  */
 export const createPost = async (req: Request, res: Response): Promise<Response | void> => {
+  // Extract conent, user ID, and filename
   const { content } = req.body;
-
-  // Ensure authentication and extract author ID
-  const author = req.auth?.userID;
-  if (!author) throw new AuthError();
-
-  // Get the filename of the uploaded file
+  const { userID } = req.auth!;
   const file = req.file?.filename;
 
   // Create a new Post instance with the validated data
   const newPost = new Post({
     content,
-    author,
+    author: userID,
     file,
   });
 

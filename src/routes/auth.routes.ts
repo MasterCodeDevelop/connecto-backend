@@ -11,13 +11,13 @@ const router = Router();
  * @desc    Create a new user account
  * @access  Public
  */
-router.post('/signup', validate(registerSchema), asyncHandler(createUser));
+router.post('/signup', validate({ body: registerSchema }), asyncHandler(createUser));
 
 /**
  * @route   POST /login
  * @desc    Authenticate user and return token
  * @access  Public
  */
-router.post('/login', validate(loginSchema), asyncHandler(loginUser));
+router.post('/login', validate({ body: loginSchema }), asyncHandler(loginUser));
 
 export default router;
