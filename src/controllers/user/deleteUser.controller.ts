@@ -4,16 +4,7 @@ import path from 'path';
 import User from '@/models/User';
 import { successResponse, deleteFileIfExists } from '@/utils';
 import { NotFoundError, UnauthorizedError } from '@/errors';
-
-/**
- * Directory for avatar uploads.
- * Configurable via the UPLOADS_BASE_PATH environment variable, defaulting to 'private/uploads/users'.
- */
-const AVATAR_UPLOADS_DIR = path.join(
-  process.cwd(),
-  process.env.UPLOADS_BASE_PATH || 'private/uploads',
-  'users',
-);
+import { UPLOADS_PATHS } from '@/config';
 
 /**
  * Deletes the user account and its associated files.
@@ -37,7 +28,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
 
   // Delete the profile picture if it is not the default avatar.
   if (user.profilePicture !== 'avatar.png') {
-    const filePath = path.join(AVATAR_UPLOADS_DIR, user.profilePicture as string);
+    const filePath = path.join(UPLOADS_PATHS.users, user.profilePicture as string);
     await deleteFileIfExists(filePath);
   }
 

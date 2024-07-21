@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { createUploadMiddleware, validate } from '@/middlewares';
-import { postIdSchema, postSchema } from '@/validations/post.validation';
+import { postIdSchema, postSchema, updatePostSchema } from '@/validations/post.validation';
 import { asyncHandler } from '@/utils';
-import { createPost, fetchAllPosts, fetchPostById, likePost } from '@/controllers';
+import { createPost, fetchAllPosts, fetchPostById, likePost, updatePost } from '@/controllers';
 
 // Create middleware for handling file uploads.
 const filePost = createUploadMiddleware('image', 'posts').single;
@@ -45,5 +45,19 @@ router.get('/:id', validate({ params: postIdSchema }), asyncHandler(fetchPostByI
  * @access  Private
  */
 router.patch('/:id/like', validate({ params: postIdSchema }), asyncHandler(likePost));
+
+/**
+ * This route allows a user to update a post.
+ *
+ * @route   PATCH /api/post/:id
+ * @desc    Update a post with an optional image file.
+ * @access  Private
+ */
+router.patch(
+  '/:id',
+  filePost,
+  validate({ params: postIdSchema, body: updatePostSchema }),
+  asyncHandler(updatePost),
+);
 
 export default router;

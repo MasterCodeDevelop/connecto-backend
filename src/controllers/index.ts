@@ -15,3 +15,4 @@ export * from './post/fetchAllPosts.controller';
 export * from './post/fetchPostById.controller';
 export * from './post/getPostFile.controller';
 export * from './post/likePost.controller';
+export * from './post/updatePost.controller';

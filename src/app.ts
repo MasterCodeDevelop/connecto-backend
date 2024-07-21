@@ -1,9 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import connectToDatabase from './config/db';
 import helmet from 'helmet';
 import cors from 'cors';
-import { corsOptions } from './config/corsConfig';
+import { connectToDatabase, corsOptions } from './config';
 import router from './routes';
 import { errorHandler, morganMiddleware } from './middlewares';
 

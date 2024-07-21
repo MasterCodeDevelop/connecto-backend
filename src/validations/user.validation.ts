@@ -103,6 +103,7 @@ export const updateProfileSchema = z
       })
       .optional(),
   })
+  .strict()
   .refine(({ name, familyName, file }) => !!name || !!familyName || !!file?.originalname, {
     message: 'At least one of name, familyName, or file must be provided.',
     path: ['name', 'familyName', 'file'],

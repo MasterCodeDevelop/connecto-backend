@@ -1,4 +1,4 @@
-import { logger } from '@/config/logger';
+import { logger } from '@/config';
 import { InternalError } from '@/errors';
 import NodeJS from 'node:process';
 type ServerErrorCode = 'EACCES' | 'EADDRINUSE';

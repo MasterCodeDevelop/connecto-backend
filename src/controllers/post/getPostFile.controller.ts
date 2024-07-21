@@ -2,15 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { Request, Response } from 'express';
 import { BadRequestError, NotFoundError } from '@/errors';
-
-/**
- * Base upload directory, configurable via .env or defaults to `private/uploads`
- */
-const POST_UPLOADS_DIR = path.join(
-  process.cwd(),
-  process.env.UPLOADS_BASE_PATH || 'private/uploads',
-  'posts',
-);
+import { UPLOADS_PATHS } from '@/config';
 
 /**
  * Controller to securely serve a post's file from the private storage.
@@ -25,7 +17,7 @@ const POST_UPLOADS_DIR = path.join(
  */
 export const getPostFile = async (req: Request, res: Response): Promise<Response | void> => {
   const { filename } = req.params;
-  const filePath = path.join(POST_UPLOADS_DIR, filename);
+  const filePath = path.join(UPLOADS_PATHS.posts, filename);
 
   // Security check: prevent directory traversal and restrict extensions
   const isValidFilename = /^[\w-]+\.(jpg|jpeg|png|webp)$/i.test(filename);

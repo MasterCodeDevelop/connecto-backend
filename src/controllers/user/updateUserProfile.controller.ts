@@ -3,15 +3,7 @@ import path from 'path';
 import User from '@/models/User';
 import { successResponse, deleteFileIfExists } from '@/utils';
 import { NotFoundError, BadRequestError } from '@/errors';
-
-/**
- * Base upload directory, configurable via .env or defaults to `private/uploads`
- */
-const filePath = path.join(
-  process.cwd(),
-  process.env.UPLOADS_BASE_PATH || 'private/uploads',
-  'users',
-);
+import { UPLOADS_PATHS } from '@/config';
 
 /**
  * Updates the authenticated user's profile (name and/or familyName).
@@ -56,7 +48,7 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<Re
       currentPicture && typeof currentPicture === 'string' && currentPicture !== 'avatar.png';
 
     if (isCustomPicture) {
-      const absolutePath = path.join(filePath, currentPicture);
+      const absolutePath = path.join(UPLOADS_PATHS.users, currentPicture);
       await deleteFileIfExists(absolutePath);
     }
 

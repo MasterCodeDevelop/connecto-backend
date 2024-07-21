@@ -48,6 +48,16 @@ export const id = z
 /* -------------------------------------------------------------------------- */
 
 /**
+ * Schema for a file object.
+ * Includes original name, MIME type, and size.
+ */
+const file = z.object({
+  originalname: fileName,
+  mimetype: fileMimeType,
+  size: fileSize,
+});
+
+/**
  * Schema for a post.
  * Requires a valid content field.
  * Optionally accepts a file object with original name, MIME type, and size.
@@ -55,13 +65,7 @@ export const id = z
 export const postSchema = z
   .object({
     content,
-    file: z
-      .object({
-        originalname: fileName,
-        mimetype: fileMimeType,
-        size: fileSize,
-      })
-      .optional(),
+    file: file.optional(),
   })
   .strict();
 
@@ -82,3 +86,23 @@ export const postIdSchema = z.object({
  * Type definition for the validated parameters.
  */
 export type PostId = z.infer<typeof postIdSchema>;
+
+/**
+ * Schema for updating a post.
+ * Both the "content" and "file" fields are optional,
+ * however, at least one of them must be provided.
+ */
+export const updatePostSchema = z
+  .object({
+    content: content.optional(),
+    file: file.optional(),
+  })
+  .strict()
+  .refine(({ content, file }) => content || file, {
+    message: 'At least content or file must be provided.',
+  });
+
+/**
+ * Type definition for update post form data.
+ */
+export type UpdatePostFormData = z.infer<typeof updatePostSchema>;

@@ -1,5 +1,5 @@
 import morgan from 'morgan';
-import { logger } from '@/config/logger';
+import { logger } from '@/config';
 
 // Morgan stream that redirects logs to Winston's http level
 const stream = {

@@ -1,7 +1,8 @@
 import multer, { FileFilterCallback, Multer } from 'multer';
 import path from 'path';
-import { ensureDirectoryExists, generateFileName } from '../utils/files';
 import { Express } from 'express';
+import { ensureDirectoryExists, generateFileName } from '@/utils';
+import { BASE_UPLOADS_DIR } from '@/config';
 
 /**
  * Supported MIME types grouped by category.
@@ -13,13 +14,6 @@ const MIME_TYPES: Record<'image' | 'video', string[]> = {
 
 type FileType = 'image' | 'video' | 'any';
 
-/**
- * Base upload directory, configurable via .env or defaults to `private/uploads`
- */
-const BASE_UPLOADS_DIR = path.join(
-  process.cwd(),
-  process.env.UPLOADS_BASE_PATH || 'private/uploads',
-);
 /**
  * Creates a configurable multer middleware instance with storage, file filter and size limit.
  *

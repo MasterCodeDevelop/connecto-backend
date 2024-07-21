@@ -2,7 +2,7 @@
 import { ErrorRequestHandler } from 'express';
 import { HttpError } from '@/errors';
 import { errorResponse, INTERNAL_SERVER_ERROR, parseStackTrace } from '@/utils';
-import { logger } from '@/config/logger';
+import { logger } from '@/config';
 
 /**
  * Global error-handling middleware for Express applications.

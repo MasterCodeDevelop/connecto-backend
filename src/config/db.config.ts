@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { logger } from './logger';
+import { logger } from './logger.config';
 import { InternalError } from '@/errors';
 import { validateDbConfig, getMongoUri, handleMongoConnectionError } from '@/utils/dbUtils';
 
@@ -7,7 +7,7 @@ import { validateDbConfig, getMongoUri, handleMongoConnectionError } from '@/uti
  * Connects to the MongoDB database using Mongoose.
  * Throws an error if the connection fails.
  */
-const connectToDatabase = async (): Promise<void> => {
+export const connectToDatabase = async (): Promise<void> => {
   // Validate DB config from environment variables
   if (!validateDbConfig()) {
     throw new InternalError('Database configuration validation failed.');
@@ -25,5 +25,3 @@ const connectToDatabase = async (): Promise<void> => {
     handleMongoConnectionError(error, mongoURI);
   }
 };
-
-export default connectToDatabase;

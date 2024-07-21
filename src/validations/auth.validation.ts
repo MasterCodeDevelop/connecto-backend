@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 export const authSchema = z.object({
   // Validates that the userId exists and conforms to the MongoDB ObjectId format.
   // The error messages are generic to avoid leaking information.
-  userId: z
+  userID: z
     .string({
       required_error: 'Invalid token payload.',
     })

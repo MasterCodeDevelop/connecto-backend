@@ -1,5 +1,5 @@
 import { CorsOptions } from 'cors';
-import { logger } from './logger';
+import { logger } from './logger.config';
 
 // Load CORS origins from environment or default to "*"
 const envOrigins = process.env.CORS_ORIGINS || '*';

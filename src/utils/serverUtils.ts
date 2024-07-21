@@ -1,5 +1,5 @@
 import { Server } from 'http';
-import { logger } from '@/config/logger';
+import { logger } from '@/config';
 import { InternalError } from '@/errors';
 
 /**

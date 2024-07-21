@@ -1,5 +1,5 @@
 import { InternalError } from '@/errors';
-import { logger } from '@/config/logger';
+import { logger } from '@/config';
 import dotenv from 'dotenv';
 
 dotenv.config();
