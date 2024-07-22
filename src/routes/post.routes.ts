@@ -2,7 +2,14 @@ import { Router } from 'express';
 import { createUploadMiddleware, validate } from '@/middlewares';
 import { postIdSchema, postSchema, updatePostSchema } from '@/validations/post.validation';
 import { asyncHandler } from '@/utils';
-import { createPost, fetchAllPosts, fetchPostById, likePost, updatePost } from '@/controllers';
+import {
+  createPost,
+  fetchAllPosts,
+  fetchPostById,
+  likePost,
+  updatePost,
+  deletePost,
+} from '@/controllers';
 
 // Create middleware for handling file uploads.
 const filePost = createUploadMiddleware('image', 'posts').single;
@@ -59,5 +66,14 @@ router.patch(
   validate({ params: postIdSchema, body: updatePostSchema }),
   asyncHandler(updatePost),
 );
+
+/**
+ * This route allows a user to delete a post.
+ *
+ * @route   DELETE /api/post/:id
+ * @desc    Delete a post by its ID.
+ * @access  Private
+ */
+router.delete('/:id', validate({ params: postIdSchema }), asyncHandler(deletePost));
 
 export default router;

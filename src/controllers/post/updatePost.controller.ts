@@ -42,7 +42,7 @@ export const updatePost = async (req: Request, res: Response): Promise<Response 
   if (!post) throw new NotFoundError('Post not found.');
 
   // Ensure that the user requesting the update is the author
-  if (!userID || !post.author._id.equals(userID)) {
+  if (!post.author._id.equals(userID)) {
     throw new UnauthorizedError('You are not authorized to update this post.');
   }
 
