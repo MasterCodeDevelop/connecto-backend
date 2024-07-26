@@ -1,7 +1,7 @@
 import { verify } from 'argon2';
 import { Request, Response } from 'express';
 import path from 'path';
-import User from '@/models/User';
+import { User } from '@/models';
 import { successResponse, deleteFileIfExists } from '@/utils';
 import { NotFoundError, UnauthorizedError } from '@/errors';
 import { UPLOADS_PATHS } from '@/config';

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 
 // TypeScript interface for a user
@@ -62,4 +62,4 @@ userSchema.plugin(uniqueValidator, {
 });
 
 // Export the model
-export default mongoose.model<IUser>('User', userSchema);
+export const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);

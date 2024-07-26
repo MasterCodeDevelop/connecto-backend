@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import path from 'path';
-import User from '@/models/User';
+import { User } from '@/models';
 import { successResponse, deleteFileIfExists } from '@/utils';
 import { NotFoundError, BadRequestError } from '@/errors';
 import { UPLOADS_PATHS } from '@/config';

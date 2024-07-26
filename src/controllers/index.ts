@@ -3,17 +3,20 @@ export * from './auth/createUser.controller';
 export * from './auth/loginUser.controller';
 
 // Export user controllers
-export * from './user/deleteUser.controller';
-export * from './user/getUserAvatar.controller';
-export * from './user/getUserProfile.controller';
-export * from './user/updatePassword.controller';
-export * from './user/updateUserProfile.controller';
+export * from './users/deleteUser.controller';
+export * from './users/getUserAvatar.controller';
+export * from './users/getUserProfile.controller';
+export * from './users/updatePassword.controller';
+export * from './users/updateUserProfile.controller';
 
 // Export post controllers
-export * from './post/createPost.controller';
-export * from './post/fetchAllPosts.controller';
-export * from './post/fetchPostById.controller';
-export * from './post/getPostFile.controller';
-export * from './post/likePost.controller';
-export * from './post/updatePost.controller';
-export * from './post/deletePost.controller';
+export * from './posts/createPost.controller';
+export * from './posts/fetchAllPosts.controller';
+export * from './posts/fetchPostById.controller';
+export * from './posts/getPostFile.controller';
+export * from './posts/likePost.controller';
+export * from './posts/updatePost.controller';
+export * from './posts/deletePost.controller';
+
+// Export comment controllers
+export * from './comments/createComment.controller';

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { createUploadMiddleware, validate } from '@/middlewares';
-import { postIdSchema, postSchema, updatePostSchema } from '@/validations/post.validation';
+import { postIdSchema, postSchema, updatePostSchema, commentSchema } from '@/validations';
 import { asyncHandler } from '@/utils';
 import {
   createPost,
@@ -9,6 +9,7 @@ import {
   likePost,
   updatePost,
   deletePost,
+  createComment,
 } from '@/controllers';
 
 // Create middleware for handling file uploads.
@@ -75,5 +76,18 @@ router.patch(
  * @access  Private
  */
 router.delete('/:id', validate({ params: postIdSchema }), asyncHandler(deletePost));
+
+/**
+ * This route handles the creation of a new comment
+ *
+ * @route   POST /api/post/comments
+ * @desc    Create a new Comment
+ * @access  Private
+ */
+router.post(
+  '/:id/comments',
+  validate({ params: postIdSchema, body: commentSchema }),
+  asyncHandler(createComment),
+);
 
 export default router;

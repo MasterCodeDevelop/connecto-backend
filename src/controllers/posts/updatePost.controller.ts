@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
-import Post from '@/models/Post';
+import { Post } from '@/models';
 import { NotFoundError, UnauthorizedError } from '@/errors';
 import { successResponse } from '@/utils';
 import { UPLOADS_PATHS } from '@/config';

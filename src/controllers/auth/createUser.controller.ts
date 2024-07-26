@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '@/models/User';
+import { User } from '@/models';
 import { hash, generateToken, successResponse, CREATED } from '@/utils';
 import { ConflictError, InternalError } from '@/errors';
 

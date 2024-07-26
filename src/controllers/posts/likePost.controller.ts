@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
-import Post from '@/models/Post';
+import { Post } from '@/models';
 import { successResponse } from '@/utils';
 import { NotFoundError } from '@/errors';
 

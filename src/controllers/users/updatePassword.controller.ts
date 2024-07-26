@@ -1,6 +1,6 @@
 import argon2 from 'argon2';
 import { Request, Response } from 'express';
-import User from '@/models/User';
+import { User } from '@/models';
 import { hash, successResponse } from '@/utils';
 import { NotFoundError, UnauthorizedError, InternalError } from '@/errors';
 
