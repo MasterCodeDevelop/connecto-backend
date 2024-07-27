@@ -10,6 +10,7 @@ import {
   updatePost,
   deletePost,
   createComment,
+  fetchPostComments,
 } from '@/controllers';
 
 // Create middleware for handling file uploads.
@@ -89,5 +90,14 @@ router.post(
   validate({ params: postIdSchema, body: commentSchema }),
   asyncHandler(createComment),
 );
+
+/**
+ * This route fetches all comments for a given post.
+ *
+ * @route   GET /api/post/:id/comments
+ * @desc    Fetch all comments for a given post.
+ * @access  Private
+ */
+router.get('/:id/comments', validate({ params: postIdSchema }), asyncHandler(fetchPostComments));
 
 export default router;
