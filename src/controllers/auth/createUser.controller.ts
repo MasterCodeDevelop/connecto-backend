@@ -44,5 +44,9 @@ export const createUser = async (
   if (!token) throw new InternalError('JWT signing failed.');
 
   // Return success response
-  return successResponse(res, 'User created successfully.', { token }, CREATED);
+  return successResponse(
+    res,
+    { token },
+    { message: 'User created successfully.', status: CREATED },
+  );
 };

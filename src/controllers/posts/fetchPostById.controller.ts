@@ -23,5 +23,5 @@ export const fetchPostById = async (req: Request, res: Response): Promise<Respon
   if (!post) throw new NotFoundError('Post not found.');
 
   // Return the post data with a successful status code.
-  return successResponse(res, 'Post retrieved successfully.', { post });
+  return successResponse(res, { post });
 };

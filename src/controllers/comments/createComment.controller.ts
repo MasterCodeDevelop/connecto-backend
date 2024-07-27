@@ -50,5 +50,9 @@ export const createComment = async (req: Request, res: Response): Promise<Respon
   );
 
   // Return the populated comment with a successful status code.
-  return successResponse(res, 'Comment created successfully.', { populatedComment });
+  return successResponse(
+    res,
+    { populatedComment },
+    { message: 'Comment created successfully.', status: 201 },
+  );
 };

@@ -41,5 +41,5 @@ export const deletePost = async (req: Request, res: Response): Promise<Response>
   // Remove the post from the database
   await post.deleteOne();
 
-  return successResponse(res, 'Post deleted successfully.');
+  return successResponse(res, { message: 'Post deleted successfully.' });
 };

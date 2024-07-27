@@ -35,5 +35,5 @@ export const createPost = async (req: Request, res: Response): Promise<Response 
   );
 
   // Return a success response with the created post.
-  return successResponse(res, 'Post created successfully.', { post });
+  return successResponse(res, { post }, { message: 'Post created successfully.', status: 201 });
 };

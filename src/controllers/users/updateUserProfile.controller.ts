@@ -63,5 +63,5 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<Re
   if (!updatedUser) throw new NotFoundError('User not found.');
 
   // Response with the updated user data
-  return successResponse(res, 'User profile updated successfully.', { user: updatedUser });
+  return successResponse(res, { user: updatedUser }, { message: 'Profile updated successfully.' });
 };

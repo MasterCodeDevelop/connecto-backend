@@ -2,26 +2,34 @@ import { Response, Request } from 'express';
 import type { HttpStatusCode } from './httpStatus';
 import { INTERNAL_SERVER_ERROR, OK } from './httpStatus';
 
+type SuccessResponseOptions = {
+  message?: string;
+  status?: HttpStatusCode;
+};
+
 /**
- * Sends a standardized successful response.
+ * Sends a standardized success response with optional metadata and status.
  *
- * @param res - Express response object
- * @param message - Human-readable success message
- * @param data - Optional payload to return
- * @param status - Optional HTTP status code (default: 200 OK)
- * @returns Express Response with formatted JSON
+ * @param res - Express Response object
+ * @param data - Payload to return (can be null or an object)
+ * @param options - Optional config: message, status code
+ * @returns Response object with JSON
  */
 export const successResponse = (
   res: Response,
-  message: string,
   data: Record<string, unknown> | null = null,
-  status: HttpStatusCode = OK,
+  options: SuccessResponseOptions = {},
 ): Response => {
-  return res.status(status).json({
+  const { message, status = OK } = options;
+
+  const response: Record<string, unknown> = {
     success: true,
-    message,
-    data,
-  });
+  };
+
+  if (message) response.message = message;
+  if (data !== null) response.data = data;
+
+  return res.status(status).json(response);
 };
 
 /**

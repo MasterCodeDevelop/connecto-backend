@@ -20,5 +20,5 @@ export const getUserProfile = async (req: Request, res: Response): Promise<Respo
   if (!user) throw new NotFoundError('User not found.');
 
   // Return the user information
-  return successResponse(res, 'User profile retrieved successfully.', { user });
+  return successResponse(res, { user });
 };

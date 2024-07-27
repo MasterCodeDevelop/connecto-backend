@@ -49,5 +49,5 @@ export const updatePassword = async (req: Request, res: Response): Promise<Respo
   await User.findByIdAndUpdate(userID, { password: hashedNewPassword });
 
   // Return success response
-  return successResponse(res, 'Password updated successfully.');
+  return successResponse(res, { message: 'Password updated successfully.' });
 };

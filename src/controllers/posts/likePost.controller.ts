@@ -35,5 +35,5 @@ export const likePost = async (req: Request, res: Response): Promise<Response | 
   const action = userIndex === -1 ? 'liked' : 'unliked';
 
   // Return the updated post
-  return successResponse(res, `Post ${action} successfully.`, { post });
+  return successResponse(res, { post }, { message: `You ${action} the post.` });
 };

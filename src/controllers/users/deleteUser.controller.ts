@@ -37,5 +37,5 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
   if (!deletedUser) throw new NotFoundError('User not found or already deleted.');
 
   // Return a success response.
-  return successResponse(res, 'Your account has been deleted.');
+  return successResponse(res, { message: 'Your account has been deleted.' });
 };

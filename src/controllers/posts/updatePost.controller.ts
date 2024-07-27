@@ -61,5 +61,5 @@ export const updatePost = async (req: Request, res: Response): Promise<Response 
   // Save the updated post to the database
   await post.save();
 
-  return successResponse(res, 'Post updated successfully.', { post });
+  return successResponse(res, { post }, { message: 'Post updated successfully.' });
 };

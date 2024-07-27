@@ -33,5 +33,5 @@ export const loginUser = async (req: Request, res: Response): Promise<Response> 
   if (!token) throw new InternalError('JWT signing failed.');
 
   // Return success response
-  return successResponse(res, 'Login successful.', { token });
+  return successResponse(res, { token });
 };

@@ -25,5 +25,5 @@ export const fetchAllPosts = async (req: Request, res: Response): Promise<Respon
   if (!posts) throw new NotFoundError('No posts found.');
 
   // Return a successful response with the list of posts.
-  return successResponse(res, 'Posts retrieved successfully.', { posts });
+  return successResponse(res, { posts });
 };
