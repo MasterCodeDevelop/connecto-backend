@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { ForbiddenError, InternalError, UnauthorizedError } from '@/errors';
+import { UnauthorizedError, ForbiddenError, InternalError } from '@/errors';
 
 // Interface defining the expected structure of the JWT payload
 interface AuthPayload extends JwtPayload {
   userID: string;
 }
-
 // Extending the Express Request object to include authentication data
 declare module 'express' {
   interface Request {
@@ -14,68 +13,60 @@ declare module 'express' {
   }
 }
 
+// Interface for authentication middleware options
+interface AuthOptions {
+  allowUrlToken?: boolean;
+}
+
 /**
- * Middleware for authenticating JWT tokens.
+ * JWT authentication middleware.
+ * Supports both Authorization header and optional URL query (?token=).
  *
- * This middleware verifies the JWT provided in the Authorization header.
- * If valid, it extracts user details and appends them to the request object.
- * If invalid or missing, it responds with an appropriate error.
- *
- * @param req - Express request object
- * @param res - Express response object
- * @param next - Express next function to pass control to the next middleware
- * @returns Response object in case of an error, otherwise calls next()
+ * @param options - allowUrlToken: if true, accepts token from URL query
+ * @returns Express middleware function
  */
-export const authMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void | Response => {
-  const { authorization } = req.headers;
-  const jwtSecret = process.env.JWT_SECRET;
+export const authMiddleware =
+  (options: AuthOptions = {}) =>
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const { allowUrlToken = false } = options;
 
-  try {
-    // Ensure the Authorization header exists and is correctly formatted
-    if (!authorization || !authorization.startsWith('Bearer '))
-      throw new UnauthorizedError('Authorization header is missing or improperly formatted!');
+    try {
+      const tokenFromUrl =
+        allowUrlToken && typeof req.query.token === 'string' ? req.query.token : null;
+      const tokenFromHeader = req.headers.authorization?.startsWith('Bearer ')
+        ? req.headers.authorization.split(' ')[1]
+        : null;
 
-    // Extract the token from the Authorization header
-    const token = authorization.split(' ')[1];
-    if (!token) throw new UnauthorizedError('Token is missing !');
+      // Check if token is present
+      const token = tokenFromUrl || tokenFromHeader;
+      if (!token) throw new UnauthorizedError('Access token is required.');
 
-    // Ensure the JWT secret is available in environment variables
-    if (!jwtSecret) throw new InternalError('JWT secret key is missing in environment variables!');
+      // Ensure the JWT secret is available in environment variables
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret)
+        throw new InternalError('JWT secret is not defined in environment variables.');
 
-    // Verify the JWT and extract its payload
-    const decoded = jwt.verify(token, jwtSecret) as AuthPayload;
-
-    // Ensure the token contains a valid user ID
-    if (!decoded.userID) throw new ForbiddenError('Invalid token! Access denied.');
-
-    // Attach the authenticated user data to the request object
-    req.auth = { userID: decoded.userID };
-
-    // Proceed to the next middleware
-    next();
-
-    //  Handle Errors
-  } catch (error) {
-    if (error instanceof Error) {
-      // Handle TokenExpiredError
-      if (error.name === 'TokenExpiredError') {
-        return next(new UnauthorizedError('Session expired. Please log in again.'));
+      // Verify and decode the token
+      const decoded = jwt.verify(token, jwtSecret) as AuthPayload;
+      if (!decoded.userID) {
+        throw new ForbiddenError('Invalid token payload: userID is missing.');
       }
 
-      // Handle JsonWebTokenError
-      if (error.name === 'JsonWebTokenError') {
-        return next(new UnauthorizedError('Invalid token format.'));
+      // Attach user ID to auth request and pass control to the next middleware
+      req.auth = { userID: decoded.userID };
+      next();
+    } catch (error) {
+      if (error instanceof Error) {
+        switch (error.name) {
+          case 'TokenExpiredError':
+            return next(new UnauthorizedError('Session expired. Please log in again.'));
+          case 'JsonWebTokenError':
+            return next(new UnauthorizedError('Invalid token format.'));
+          case 'NotBeforeError':
+            return next(new UnauthorizedError('Token not active yet.'));
+        }
       }
 
-      // Handle NotBeforeError
-      if (error.name === 'NotBeforeError') {
-        return next(new UnauthorizedError('Token not active yet.'));
-      }
+      return next(error);
     }
-    return next(error);
-  }
-};
+  };
