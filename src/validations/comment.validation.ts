@@ -1,4 +1,16 @@
 import { z } from 'zod';
+import mongoose from 'mongoose';
+
+/**
+ * Validates that the comment ID is a valid MongoDB ObjectId.
+ * Leverages Mongoose's built-in ID validation.
+ */
+export const id = z
+  .string()
+  .min(1, 'comment ID is required')
+  .refine((value) => mongoose.Types.ObjectId.isValid(value), {
+    message: 'Invalid comment ID format',
+  });
 
 /**
  * Validation schema for creating a comment.
@@ -15,5 +27,13 @@ export const commentSchema = z
       .max(1000, 'Comment cannot exceed 1000 characters.'),
   })
   .strict();
+
+/**
+ * Schema for validating the "id" parameter in the request.
+ * Ensures that the id is a non-empty string and conforms to MongoDB's ObjectId format.
+ */
+export const commentIdSchema = z.object({
+  id,
+});
 
 export type CommentSchema = z.infer<typeof commentSchema>;

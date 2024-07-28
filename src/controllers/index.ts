@@ -21,3 +21,4 @@ export * from './posts/deletePost.controller';
 // Export comment controllers
 export * from './comments/createComment.controller';
 export * from './comments/fetchPostComments.controller';
+export * from './comments/fetchCommentById.controller';

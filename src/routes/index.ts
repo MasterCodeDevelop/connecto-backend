@@ -3,6 +3,7 @@ import authRoutes from './auth.routes';
 import usersRoutes from './users.routes';
 import filesRoutes from './files.routes';
 import postsRoutes from './posts.routes';
+import commentsRoutes from './comments.routes';
 import { applyProtectedRoute } from '@/utils/applyProtectedRoute';
 
 const router = Router();
@@ -14,5 +15,6 @@ router.use('/auth', authRoutes);
 applyProtectedRoute(router, '/users', usersRoutes);
 applyProtectedRoute(router, '/posts', postsRoutes);
 applyProtectedRoute(router, '/files', filesRoutes, { allowUrlToken: true });
+applyProtectedRoute(router, '/comments', commentsRoutes);
 
 export default router;
