@@ -22,3 +22,4 @@ export * from './posts/deletePost.controller';
 export * from './comments/createComment.controller';
 export * from './comments/fetchPostComments.controller';
 export * from './comments/fetchCommentById.controller';
+export * from './comments/updateComment.controller';

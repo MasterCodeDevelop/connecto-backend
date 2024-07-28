@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { validate } from '@/middlewares';
-import { commentIdSchema } from '@/validations';
+import { commentIdSchema, commentSchema } from '@/validations';
 import { asyncHandler } from '@/utils';
-import { fetchCommentById } from '@/controllers';
+import { fetchCommentById, updateComment } from '@/controllers';
 
 const router = Router();
 
@@ -14,5 +14,11 @@ const router = Router();
  * @access  Private
  */
 router.get('/:id', validate({ params: commentIdSchema }), asyncHandler(fetchCommentById));
+
+router.put(
+  '/:id',
+  validate({ params: commentIdSchema, body: commentSchema }),
+  asyncHandler(updateComment),
+);
 
 export default router;
