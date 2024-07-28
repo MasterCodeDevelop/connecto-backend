@@ -32,19 +32,19 @@ export const createComment = async (req: Request, res: Response): Promise<Respon
   }
 
   // Create and save the comment instance
-  const comment = new Comment({
+  const newComment = new Comment({
     content,
     author: userID,
     postId: postID,
   });
-  await comment.save();
+  await newComment.save();
 
   // Update the post's comments list with the new comment ID.
-  post.comments.push(comment._id as mongoose.Types.ObjectId);
+  post.comments.push(newComment._id as mongoose.Types.ObjectId);
   await post.save();
 
   // Populate author fields for the response
-  const populatedComment = await Comment.findById(comment._id).populate(
+  const comment = await Comment.findById(newComment._id).populate(
     'author',
     'name familyName profilePicture',
   );
@@ -52,7 +52,7 @@ export const createComment = async (req: Request, res: Response): Promise<Respon
   // Return the populated comment with a successful status code.
   return successResponse(
     res,
-    { populatedComment },
+    { comment },
     { message: 'Comment created successfully.', status: 201 },
   );
 };
