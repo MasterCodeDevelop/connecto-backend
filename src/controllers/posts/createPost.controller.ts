@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { Post } from '@/models';
+import { Post, User } from '@/models';
 import { successResponse } from '@/utils';
-
+import { UnauthorizedError } from '@/errors';
 /**
  * Controller to create a new post with an image upload.
  *
@@ -17,6 +17,12 @@ export const createPost = async (req: Request, res: Response): Promise<Response 
   const { content } = req.body;
   const { userID } = req.auth!;
   const file = req.file?.filename;
+
+  // Check if the authenticated user exists
+  const userExists = await User.exists({ _id: userID });
+  if (!userExists) {
+    throw new UnauthorizedError('Authenticated user does not exist.');
+  }
 
   // Create a new Post instance with the validated data
   const newPost = new Post({

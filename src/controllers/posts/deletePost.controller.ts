@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs/promises';
-import { Post } from '@/models';
+import { Post, Comment } from '@/models';
 import { NotFoundError, UnauthorizedError } from '@/errors';
 import { UPLOADS_PATHS } from '@/config';
 import { successResponse } from '@/utils';
@@ -36,6 +36,11 @@ export const deletePost = async (req: Request, res: Response): Promise<Response>
   if (post.file) {
     const filePath = path.join(UPLOADS_PATHS.posts, post.file);
     await fs.unlink(filePath);
+  }
+
+  // Delete all comments associated with the post, if any.
+  if (post.comments.length > 0) {
+    await Comment.deleteMany({ _id: { $in: post.comments } });
   }
 
   // Remove the post from the database

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { ZodSchema, ZodError } from 'zod';
-import fs from 'fs';
 import { BadRequestError } from '@/errors';
 
 /**
@@ -57,13 +56,6 @@ export const validate = (schemas: {
 
       next();
     } catch (error) {
-      // If a file was uploaded and validation fails, remove the file.
-      if (req.file?.path) {
-        fs.unlink(req.file.path, (err) => {
-          next(err);
-        });
-      }
-
       if (error instanceof ZodError) {
         const message = formatZodError(error);
         return next(new BadRequestError(message));

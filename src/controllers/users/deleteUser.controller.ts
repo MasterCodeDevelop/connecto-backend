@@ -1,7 +1,7 @@
 import { verify } from 'argon2';
 import { Request, Response } from 'express';
 import path from 'path';
-import { User } from '@/models';
+import { User, Post, Comment } from '@/models';
 import { successResponse, deleteFileIfExists } from '@/utils';
 import { NotFoundError, UnauthorizedError } from '@/errors';
 import { UPLOADS_PATHS } from '@/config';
@@ -30,6 +30,25 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
   if (user.profilePicture !== 'avatar.png') {
     const filePath = path.join(UPLOADS_PATHS.users, user.profilePicture as string);
     await deleteFileIfExists(filePath);
+  }
+
+  // Fetch all posts by the user
+  const posts = await Post.find({ author: userID });
+  // Delete all associated files
+  for (const post of posts) {
+    const { comments, file } = post;
+
+    // Delete all comments associated with the post, if any.
+    if (comments.length > 0) {
+      await Comment.deleteMany({ _id: { $in: comments } });
+    }
+    // Delete the file associated with the post, if any
+    if (file) {
+      const filePath = path.join(UPLOADS_PATHS.posts, file as string);
+      await deleteFileIfExists(filePath);
+    }
+    // Delete the post
+    await post.deleteOne();
   }
 
   // Permanently delete the user account.

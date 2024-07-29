@@ -3,6 +3,7 @@ import { ErrorRequestHandler } from 'express';
 import { HttpError } from '@/errors';
 import { errorResponse, INTERNAL_SERVER_ERROR, parseStackTrace } from '@/utils';
 import { logger } from '@/config';
+import fs from 'fs';
 
 /**
  * Global error-handling middleware for Express applications.
@@ -54,6 +55,13 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next): void =>
     logger.warn(`[Handled Error] ${name}: ${message}`, { ...logContext });
   } else {
     logger.error('Unhandled Error', { ...logContext });
+  }
+
+  // If a file was uploaded and validation fails, remove the file.
+  if (req.file?.path) {
+    fs.unlink(req.file.path, (err) => {
+      logger.warn(`Failed to delete uploaded file ${req.file?.path}`, { error: err });
+    });
   }
 
   // Send error response to client

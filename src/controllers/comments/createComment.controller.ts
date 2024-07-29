@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { Comment, Post } from '@/models';
 import { successResponse } from '@/utils';
-
+import { NotFoundError } from '@/errors';
 /**
  * Controller to create a new comment on a post.
  *
@@ -27,9 +27,7 @@ export const createComment = async (req: Request, res: Response): Promise<Respon
 
   // Ensure the target post exists
   const post = await Post.findById(postID);
-  if (!post) {
-    return res.status(404).json({ message: 'Post not found.' });
-  }
+  if (!post) throw new NotFoundError('Post not found.');
 
   // Create and save the comment instance
   const newComment = new Comment({
