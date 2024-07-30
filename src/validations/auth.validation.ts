@@ -1,25 +1,11 @@
 import { z } from 'zod';
-import mongoose from 'mongoose';
+import { objectId } from './utils';
 
-/**
- * Schema for validating authentication payloads.
- * Intended for validating the content of a JWT token's payload in auth middleware.
- */
 export const authSchema = z.object({
-  // Validates that the userId exists and conforms to the MongoDB ObjectId format.
-  // The error messages are generic to avoid leaking information.
-  userID: z
-    .string({
-      required_error: 'Invalid token payload.',
-    })
-    .min(1, 'Invalid token payload.')
-    .refine((value) => mongoose.Types.ObjectId.isValid(value), {
-      message: 'Invalid token payload.',
-    }),
+  /**
+   * MongoDB user ID extracted from JWT payload.
+   */
+  userID: objectId('Authenticated'),
 });
 
-/**
- * TypeScript type inferred from the authSchema.
- * Use this type in controllers and middleware for consistency.
- */
 export type AuthPayload = z.infer<typeof authSchema>;
