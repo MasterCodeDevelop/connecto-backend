@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { validate } from '@/middlewares';
 import { commentIdSchema, commentSchema } from '@/validations';
-import { asyncHandler } from '@/utils';
+import { secureRoute } from '@/utils';
 import { fetchCommentById, updateComment, deleteComment } from '@/controllers';
 
 const router = Router();
@@ -13,7 +12,7 @@ const router = Router();
  * @desc    Fetch a comment by its ID
  * @access  Private
  */
-router.get('/:id', validate({ params: commentIdSchema }), asyncHandler(fetchCommentById));
+router.get('/:id', ...secureRoute(fetchCommentById, { params: commentIdSchema }));
 
 /**
  * This route allows a user to update a comment.
@@ -22,11 +21,7 @@ router.get('/:id', validate({ params: commentIdSchema }), asyncHandler(fetchComm
  * @desc    Update a comment by its ID
  * @access  Private
  */
-router.put(
-  '/:id',
-  validate({ params: commentIdSchema, body: commentSchema }),
-  asyncHandler(updateComment),
-);
+router.put('/:id', ...secureRoute(updateComment, { params: commentIdSchema, body: commentSchema }));
 
 /**
  * This route allows a user to delete a comment.
@@ -35,6 +30,6 @@ router.put(
  * @desc    Delete a comment by its ID
  * @access  Private
  */
-router.delete('/:id', validate({ params: commentIdSchema }), asyncHandler(deleteComment));
+router.delete('/:id', ...secureRoute(deleteComment, { params: commentIdSchema }));
 
 export default router;

@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { createUploadMiddleware, validate } from '@/middlewares';
+import { createUploadMiddleware } from '@/middlewares';
 import {
   passwordSchema,
   deleteUserSchema,
   updateProfileSchema,
 } from '@/validations/user.validation';
-import { asyncHandler } from '@/utils';
+import { asyncHandler, secureRoute } from '@/utils';
 import { getUserProfile, updateUserProfile, updatePassword, deleteUser } from '@/controllers';
 
 // Middleware to handle profile picture upload
@@ -29,8 +29,7 @@ router.get('/profile', asyncHandler(getUserProfile));
 router.patch(
   '/profile',
   avatarUpload,
-  validate({ body: updateProfileSchema }),
-  asyncHandler(updateUserProfile),
+  ...secureRoute(updateUserProfile, { body: updateProfileSchema }),
 );
 
 /**
@@ -38,12 +37,12 @@ router.patch(
  * @desc    Updates the user's password.
  * @access  Private (JWT required)
  */
-router.put('/password', validate({ body: passwordSchema }), asyncHandler(updatePassword));
+router.put('/password', ...secureRoute(updatePassword, { body: passwordSchema }));
 
 /**
  * @route   DELETE /api/user
  * @desc    Deletes the user account and its associated files.
  * @access  Private
  */
-router.delete('/', validate({ body: deleteUserSchema }), asyncHandler(deleteUser));
+router.delete('/', ...secureRoute(deleteUser, { body: deleteUserSchema }));
 export default router;

@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { createUploadMiddleware, validate } from '@/middlewares';
+import { createUploadMiddleware } from '@/middlewares';
 import { postIdSchema, postSchema, updatePostSchema, commentSchema } from '@/validations';
-import { asyncHandler } from '@/utils';
+import { secureRoute, asyncHandler } from '@/utils';
 import {
   createPost,
   fetchAllPosts,
@@ -26,7 +26,7 @@ const router = Router();
  * @desc    Create a new Post with an optional image file.
  * @access  Private
  */
-router.post('/', filePost, validate({ body: postSchema }), asyncHandler(createPost));
+router.post('/', filePost, ...secureRoute(createPost, { body: postSchema }));
 
 /**
  * This route fetches all posts from the database.
@@ -44,7 +44,7 @@ router.get('/', asyncHandler(fetchAllPosts));
  * @desc    Fetch a specific post by its ID.
  * @access  Private
  */
-router.get('/:id', validate({ params: postIdSchema }), asyncHandler(fetchPostById));
+router.get('/:id', ...secureRoute(fetchPostById, { params: postIdSchema }));
 
 /**
  * This route allows a user to like or unlike a post.
@@ -53,7 +53,7 @@ router.get('/:id', validate({ params: postIdSchema }), asyncHandler(fetchPostByI
  * @desc    Like or unlike a post.
  * @access  Private
  */
-router.patch('/:id/like', validate({ params: postIdSchema }), asyncHandler(likePost));
+router.patch('/:id/like', ...secureRoute(likePost, { params: postIdSchema }));
 
 /**
  * This route allows a user to update a post.
@@ -65,8 +65,7 @@ router.patch('/:id/like', validate({ params: postIdSchema }), asyncHandler(likeP
 router.patch(
   '/:id',
   filePost,
-  validate({ params: postIdSchema, body: updatePostSchema }),
-  asyncHandler(updatePost),
+  ...secureRoute(updatePost, { params: postIdSchema, body: updatePostSchema }),
 );
 
 /**
@@ -76,7 +75,7 @@ router.patch(
  * @desc    Delete a post by its ID.
  * @access  Private
  */
-router.delete('/:id', validate({ params: postIdSchema }), asyncHandler(deletePost));
+router.delete('/:id', ...secureRoute(deletePost, { params: postIdSchema }));
 
 /**
  * This route handles the creation of a new comment
@@ -87,8 +86,7 @@ router.delete('/:id', validate({ params: postIdSchema }), asyncHandler(deletePos
  */
 router.post(
   '/:id/comments',
-  validate({ params: postIdSchema, body: commentSchema }),
-  asyncHandler(createComment),
+  ...secureRoute(createComment, { params: postIdSchema, body: commentSchema }),
 );
 
 /**
@@ -98,6 +96,6 @@ router.post(
  * @desc    Fetch all comments for a given post.
  * @access  Private
  */
-router.get('/:id/comments', validate({ params: postIdSchema }), asyncHandler(fetchPostComments));
+router.get('/:id/comments', ...secureRoute(fetchPostComments, { params: postIdSchema }));
 
 export default router;

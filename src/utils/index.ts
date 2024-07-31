@@ -5,5 +5,6 @@ export * from './files';
 export * from './httpStatus';
 export * from './jwt';
 export * from './responses';
+export * from './secureRoute';
 export * from './serverUtils';
 export * from './stackTrace';
